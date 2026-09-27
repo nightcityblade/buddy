@@ -6,7 +6,7 @@ import { validateCharacter, type Character } from './character.ts';
 
 export const DEFAULT_ID = 'professor';
 
-export type Source = 'builtin' | 'user' | 'adopted';
+export type Source = 'builtin' | 'user' | 'original';
 export type Entry = { id: string; source: Source; character?: Character; error?: string };
 export type Roster = { entries: Entry[]; errors: string[] };
 /** A listed file: its text, or why it could not be read. */

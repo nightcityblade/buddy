@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import {
-  adoptCharacter, adoptChoiceOf, adoptReply, companionOf, hatRow, hatchedDate, identityOf, isBackupName, newestFirst, parseSoul, personaOf,
-  savedSoulOf, soulKey, soulPrompt, statBar, stars, welcomeLine, type Soul,
-} from '../plugins/buddy/src/adopt.ts';
+  companionOf, hatRow, hatchedDate, identityOf, isBackupName, newestFirst, originalCharacter, originalLabel, personaOf, savedOriginalOf, statBar, stars,
+  type Soul,
+} from '../plugins/buddy/src/original.ts';
 import { frameAt } from '../plugins/buddy/src/character.ts';
 import type { Bones } from '../plugins/buddy/src/hatch.ts';
 import { RAINBOW, SHINY_STEP_MS, buildScene, spriteColor } from '../plugins/buddy/src/scene.ts';
@@ -20,8 +20,8 @@ const bones = (over: Partial<Bones> = {}): Bones => ({
 });
 const soul: Soul = { name: 'Mochi', personality: 'A round, patient blob who hums at green tests.', hatchedAt: Date.UTC(2026, 3, 1) };
 
-function adopt(b: Bones = bones()) {
-  const r = adoptCharacter({ soul, bones: b, variant: 'native', template, hats: HATS });
+function original(b: Bones = bones()) {
+  const r = originalCharacter({ soul, bones: b, variant: 'native', template, hats: HATS });
   if (!r.ok) throw new Error(r.error);
   return r.character;
 }
@@ -54,10 +54,10 @@ describe('the config', () => {
   });
 });
 
-describe('adoptCharacter', () => {
+describe('originalCharacter', () => {
   test('the eye in, the hat centered on hatCol, the rarity color, the name in the lines', () => {
-    const c = adopt();
-    expect(c.id).toBe('adopted');
+    const c = original();
+    expect(c.id).toBe('original');
     expect(c.width).toBe(6);
     expect(frameAt(c, 'idle', 0)).toEqual([' www  ', ' (◉◉) ', ' (__) ']);
     expect(frameAt(c, 'sleep', 0)).toEqual([' www  ', ' (--) ', ' (__) ']);
@@ -69,29 +69,29 @@ describe('adoptCharacter', () => {
   });
 
   test('no hat: the hat row is dropped', () => {
-    const c = adopt(bones({ rarity: 'common', hat: 'none' }));
+    const c = original(bones({ rarity: 'common', hat: 'none' }));
     expect(c.height).toBe(2);
     expect(frameAt(c, 'idle', 0)).toEqual([' (◉◉) ', ' (__) ']);
     expect(c.color).toBe('white');
   });
 
   test('shiny: a sparkle column that alternates rows, and a rainbow per tick', () => {
-    const c = adopt(bones({ shiny: true }));
+    const c = original(bones({ shiny: true }));
     expect(c.width).toBe(7);
     expect(frameAt(c, 'walkRight', 0)).toEqual([' www  *', ' (◉◉)> ', ' /  \\  ']);
     expect(frameAt(c, 'walkRight', 1)).toEqual([' www   ', ' (◉◉)>*', ' |  |  ']);
     const colors = RAINBOW.map((_, i) => spriteColor(c, i * SHINY_STEP_MS));
     expect(colors).toEqual([...RAINBOW]);
-    expect(spriteColor(adopt(), 12345)).toBe('blue');
+    expect(spriteColor(original(), 12345)).toBe('blue');
   });
 
   test('a hat the art lacks, or the wrong species, is an error', () => {
-    expect(adoptCharacter({ soul, bones: bones(), variant: 'npm', template, hats: {} })).toEqual({ ok: false, error: 'species/hats.json has no crown' });
-    expect(adoptCharacter({ soul, bones: bones({ species: 'duck' }), variant: 'npm', template, hats: HATS })).toMatchObject({ ok: false });
+    expect(originalCharacter({ soul, bones: bones(), variant: 'npm', template, hats: {} })).toEqual({ ok: false, error: 'species/hats.json has no crown' });
+    expect(originalCharacter({ soul, bones: bones({ species: 'duck' }), variant: 'npm', template, hats: HATS })).toMatchObject({ ok: false });
   });
 
   test('the hover card: name, species and stars, the stats line, five bars, the hatch date', () => {
-    const s = buildScene({ character: adopt(bones({ shiny: true })), pose: 'idle', frame: 0, x: 0, cols: 100, maxRows: 10, bubble: null, confetti: null, sleeping: false, zTick: 0, stats: { pets: 2, questions: 1 }, now: 0 })!;
+    const s = buildScene({ character: original(bones({ shiny: true })), pose: 'idle', frame: 0, x: 0, cols: 100, maxRows: 10, bubble: null, confetti: null, sleeping: false, zTick: 0, stats: { pets: 2, questions: 1 }, now: 0 })!;
     expect(s.card?.lines).toEqual([
       'Mochi',
       'blob · ★★★ rare · shiny ✨',
@@ -128,44 +128,15 @@ describe('the words', () => {
     expect(p).toContain('You are sassy and a little snarky.');
     expect(p).toContain('You are a little impatient.');
   });
-
-  test('the reply: who is back, from where, the account by its last 4, the npm tip', () => {
-    const r = adoptReply({ name: 'Mochi', bones: bones({ shiny: true }), variant: 'native', origin: { kind: 'backup', label: '~/.claude.json.backup' }, account: '…cafe' });
-    expect(r.split('\n')).toEqual([
-      'Mochi the rare blob (shiny!) is back.',
-      'Its soul came from the backup ~/.claude.json.backup.',
-      'Account …cafe, rolled as the native install did.',
-      'Hatched on an npm install? /buddy adopt npm',
-    ]);
-    expect(adoptReply({ name: 'Mochi', bones: bones(), variant: 'npm', origin: { kind: 'hatched' }, account: '…' })).toContain('Mochi the rare blob hatched.');
-    expect(welcomeLine({ kind: 'file' }, 'Mochi')).toBe('Welcome back, Mochi!');
-    expect(welcomeLine({ kind: 'hatched' }, 'Mochi')).toBe("Hello! I'm Mochi.");
-  });
 });
 
-describe('a new soul', () => {
-  test('the prompt carries the bones and, on a retry, what was wrong', () => {
-    const p = soulPrompt(bones(), 123, 'no JSON object in the reply');
-    expect(p).toContain('Species: blob');
-    expect(p).toContain('Rarity: rare');
-    expect(p).toContain('SNARK 81');
-    expect(p).toContain('Inspiration seed: 123');
-    expect(p).toContain('Your last reply was not usable (no JSON object in the reply)');
-  });
-
-  test('parseSoul: JSON in the reply, validated', () => {
-    expect(parseSoul('Sure! {"name": "Pip", "personality": "A tiny blob who adores\\n tidy diffs."}')).toEqual({ soul: { name: 'Pip', personality: 'A tiny blob who adores tidy diffs.' } });
-    expect(parseSoul('no json')).toEqual({ error: 'no JSON object in the reply' });
-    expect(parseSoul('{"name": "Sir Pip The Third", "personality": "A tiny blob who adores tidy diffs."}').error).toContain('name must be');
-    expect(parseSoul('{"name": "Pip", "personality": "Short"}').error).toContain('personality must be');
-    expect(parseSoul('{"name": "Pip",}').error).toContain('not valid JSON');
-  });
-
-  test('the store: a key without the identity, a saved soul back, the choice back', () => {
-    expect(soulKey('00ff', 'npm')).toBe('soul:00ff:npm');
-    expect(savedSoulOf({ name: 'Pip', personality: 'x', from: '~/.claude.json.backup' })).toEqual({ soul: { name: 'Pip', personality: 'x' }, label: '~/.claude.json.backup' });
-    expect(savedSoulOf('junk')).toEqual({});
-    expect(adoptChoiceOf({ variant: 'npm', path: '~/x.json' })).toEqual({ variant: 'npm', path: '~/x.json' });
-    expect(adoptChoiceOf({ variant: 'bun' })).toBeUndefined();
+describe('the saved pick', () => {
+  test('the label names the roll; the stored pick comes back validated, never the identity', () => {
+    expect(originalLabel('Mochi', 'npm')).toBe('Mochi — npm install');
+    expect(savedOriginalOf({ variant: 'npm', soul })).toEqual({ variant: 'npm', soul });
+    expect(savedOriginalOf({ variant: 'native', soul: { name: 'Rex', personality: 'Gruff.' } })).toEqual({ variant: 'native', soul: { name: 'Rex', personality: 'Gruff.' } });
+    expect(savedOriginalOf({ variant: 'other', soul })).toBeUndefined();
+    expect(savedOriginalOf({ variant: 'native', soul: { personality: 'x' } })).toBeUndefined();
+    expect(savedOriginalOf(undefined)).toBeUndefined();
   });
 });

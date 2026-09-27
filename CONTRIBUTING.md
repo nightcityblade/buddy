@@ -173,8 +173,8 @@ A character ships when:
 
 ## Species templates
 
-`/buddy adopt` brings back the companion that Claude Code's old `/buddy`
-hatched for you. Your account decides its species, eye, hat and rarity; its
+The "Yours" group of `/buddy-personality` brings back the companion that
+Claude Code's old `/buddy` hatched for you. Your account decides its species, eye, hat and rarity; its
 look comes from a species template, `plugins/buddy/species/{species}.json`,
 and its hat from `plugins/buddy/species/hats.json`. A template is ASCII art
 with blanks that the engine fills in: the eyes, the hat and the color.
@@ -236,7 +236,7 @@ node -e 'const t=require("./plugins/buddy/species/blob.json");for(const [p,fs] o
 
 The engine checks a template with `validateSpecies` in
 `plugins/buddy/src/species.ts`, which reports the first thing wrong by its
-path. `/buddy adopt` draws your own companion live. A template ships under
+path. `/buddy-personality` previews your own companion live. A template ships under
 the same rules as a character: the art and the lines are your own work, and
 they are friendly.
 

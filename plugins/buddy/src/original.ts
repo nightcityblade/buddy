@@ -2,25 +2,21 @@ import { DEFAULT_MOTION, isObject, normalizeFrames, type Character, type Frame, 
 import { RARITIES, STATS, type Bones, type Rarity, type Stat, type Variant } from './hatch.ts';
 import { EYE_TOKEN, type HatArt, type SpeciesTemplate } from './species.ts';
 
-// `/buddy adopt`: the companion Claude Code hatched for this account, back on
-// the prompt line. Its bones come from hatch.ts, its soul (name, personality,
-// hatchedAt) from ~/.claude.json or a backup of it, or is hatched anew; this
-// turns the two, and a species template, into an ordinary Character. Pure.
+// The person's original companion: the one Claude Code's own /buddy hatched
+// for this account. Its bones come from hatch.ts, its soul (name,
+// personality, hatchedAt) from ~/.claude.json or a backup of it; this turns
+// the two, and a species template, into an ordinary Character. Pure.
 
-export const ADOPTED_ID = 'adopted';
+export const ORIGINAL_ID = 'original';
 export const CONFIG_NAME = '.claude.json';
 export const SHOWN_CONFIG = '~/.claude.json';
+export const VARIANTS: readonly Variant[] = ['native', 'npm'];
 
 export type Soul = { name: string; personality: string; hatchedAt?: number | string };
-/** Where the soul came from: the file, a backup of it, our store, or a new hatch. */
-export type SoulOrigin = { kind: 'file' } | { kind: 'backup'; label: string } | { kind: 'saved' } | { kind: 'hatched' };
-/** What `/buddy adopt` remembers so a restart draws the same companion: never the identity. */
-export type AdoptChoice = { variant: Variant; path?: string };
+/** What a pick of the original remembers so a restart draws it again: the soul and the roll, never the identity. */
+export type SavedOriginal = { variant: Variant; soul: Soul };
 
 export const RARITY_COLOR: Record<Rarity, string> = { common: 'white', uncommon: 'green', rare: 'blue', epic: 'magenta', legendary: 'yellow' };
-export const SOUL_NAME_MAX = 24;
-export const SOUL_PERSONALITY_MAX = 300;
-export const SOUL_MAX_TOKENS = 200;
 const BAR = 10;
 
 export function stars(r: Rarity): string {
@@ -122,10 +118,10 @@ export function cardOf(bones: Bones, soul: Soul): { subtitle: string; rows: stri
   return { subtitle, rows: [...STATS.map((s) => statBar(s, bones.stats[s])), `hatched ${hatchedDate(soul.hatchedAt)}`] };
 }
 
-export type AdoptInput = { soul: Soul; bones: Bones; variant: Variant; template: SpeciesTemplate; hats: HatArt };
+export type OriginalInput = { soul: Soul; bones: Bones; variant: Variant; template: SpeciesTemplate; hats: HatArt };
 
-/** The adopted companion as a Character; an error when the art it needs is missing. */
-export function adoptCharacter(i: AdoptInput): Validation {
+/** The original companion as a Character; an error when the art it needs is missing. */
+export function originalCharacter(i: OriginalInput): Validation {
   const { soul, bones, template: t } = i;
   if (t.species !== bones.species) return { ok: false, error: `species template is ${t.species}, the companion is a ${bones.species}` };
   let hat: string | null = null;
@@ -140,7 +136,7 @@ export function adoptCharacter(i: AdoptInput): Validation {
   }
   const norm = normalizeFrames(poses);
   const character: Character = {
-    id: ADOPTED_ID,
+    id: ORIGINAL_ID,
     name: soul.name,
     description: `${stars(bones.rarity)} ${bones.rarity} ${bones.species}${bones.shiny ? ', shiny' : ''} (${i.variant})`,
     persona: personaOf(soul, bones),
@@ -156,76 +152,14 @@ export function adoptCharacter(i: AdoptInput): Validation {
   return { ok: true, character };
 }
 
-export function adoptedTitle(name: string, bones: Bones): string {
-  return `${name} the ${bones.rarity} ${bones.species}${bones.shiny ? ' (shiny!)' : ''}`;
+/** The menu's label for one roll of the original: `Mochi — native install`. */
+export function originalLabel(name: string, variant: Variant): string {
+  return `${name} — ${variant} install`;
 }
 
-/** The bubble on arrival. */
-export function welcomeLine(origin: SoulOrigin, name: string): string {
-  return origin.kind === 'hatched' ? `Hello! I'm ${name}.` : `Welcome back, ${name}!`;
-}
-
-/** The reply to `/buddy adopt`, the account shown only as its last 4 characters. */
-export function adoptReply(i: { name: string; bones: Bones; variant: Variant; origin: SoulOrigin; account: string; notes?: readonly string[] }): string {
-  const lines = [`${adoptedTitle(i.name, i.bones)} ${i.origin.kind === 'hatched' ? 'hatched' : 'is back'}.`];
-  if (i.origin.kind === 'backup') lines.push(`Its soul came from the backup ${i.origin.label}.`);
-  if (i.origin.kind === 'saved') lines.push('Its soul is the one saved at your last /buddy adopt.');
-  lines.push(`Account ${i.account}, rolled as the ${i.variant} install did.`);
-  lines.push(i.variant === 'native' ? 'Hatched on an npm install? /buddy adopt npm' : 'Hatched on the native install? /buddy adopt');
-  return [...lines, ...(i.notes ?? [])].join('\n');
-}
-
-// ---- a new soul, from the model ------------------------------------------
-
-export const SOUL_SYSTEM = [
-  'You name a newly hatched companion: a tiny ASCII creature that lives above a developer\'s terminal prompt.',
-  'Reply with one JSON object and nothing else: {"name": "...", "personality": "..."}.',
-  `name: one short, friendly word (two at most), at most ${SOUL_NAME_MAX} characters, no emoji.`,
-  'personality: one sentence of at most 25 words describing the creature in the third person, shaped by its species, rarity and stats.',
-].join('\n');
-
-export function soulPrompt(bones: Bones, inspirationSeed: number, lastError = ''): string {
-  const rows = [
-    `Species: ${bones.species}`,
-    `Rarity: ${bones.rarity}${bones.shiny ? ' (shiny)' : ''}`,
-    `Stats (out of 100): ${STATS.map((s) => `${s} ${bones.stats[s]}`).join(', ')}`,
-    `Inspiration seed: ${inspirationSeed}`,
-  ];
-  if (lastError) rows.push(`Your last reply was not usable (${lastError}). Reply with the JSON object only.`);
-  return rows.join('\n');
-}
-
-/** The model's soul, validated: one short name and one line of personality. */
-export function parseSoul(text: string): { soul?: Soul; error?: string } {
-  const m = text.match(/\{[\s\S]*\}/);
-  if (!m) return { error: 'no JSON object in the reply' };
-  let raw: unknown;
-  try {
-    raw = JSON.parse(m[0]);
-  } catch (error) {
-    return { error: `the reply is not valid JSON: ${error instanceof Error ? error.message : String(error)}` };
-  }
-  if (!isObject(raw)) return { error: 'the reply is not a JSON object' };
-  const name = typeof raw.name === 'string' ? raw.name.trim() : '';
-  const personality = typeof raw.personality === 'string' ? raw.personality.replace(/\s+/g, ' ').trim() : '';
-  if (!name || name.length > SOUL_NAME_MAX || name.split(/\s+/).length > 2 || !/^[\x20-\x7EÀ-ɏ]+$/.test(name)) return { error: `name must be one or two words, at most ${SOUL_NAME_MAX} characters` };
-  if (personality.length < 10 || personality.length > SOUL_PERSONALITY_MAX) return { error: `personality must be one sentence of 10 to ${SOUL_PERSONALITY_MAX} characters` };
-  return { soul: { name, personality } };
-}
-
-/** A stored soul record back as a soul: our own `soul:*` store key, validated like the file's. */
-export function savedSoulOf(value: unknown): { soul?: Soul; label?: string } {
-  const s = soulOf(value);
-  if (!s.soul || !isObject(value)) return {};
-  return { soul: s.soul, label: typeof value.from === 'string' ? value.from : undefined };
-}
-
-export function adoptChoiceOf(value: unknown): AdoptChoice | undefined {
+/** The stored pick back: its variant and soul, validated like the file's; undefined when absent or malformed. */
+export function savedOriginalOf(value: unknown): SavedOriginal | undefined {
   if (!isObject(value) || (value.variant !== 'native' && value.variant !== 'npm')) return undefined;
-  return typeof value.path === 'string' && value.path !== '' ? { variant: value.variant, path: value.path } : { variant: value.variant };
-}
-
-/** The store key of an identity's soul per variant: the identity's hash, never the identity. */
-export function soulKey(identityHash: string, variant: Variant): string {
-  return `soul:${identityHash}:${variant}`;
+  const s = soulOf(value.soul);
+  return s.soul ? { variant: value.variant, soul: s.soul } : undefined;
 }

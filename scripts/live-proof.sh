@@ -11,9 +11,11 @@
 #   (f) a /buddy question after a reply (a fork of the chat) is answered
 #   (g) /buddy use {another} draws another character; use default returns
 #   (h) /buddy off hides the band; /buddy on brings it back
-#   (i) /buddy adopt from tests/fixtures/claude-json-fake.json (an invented
-#       account and companion; HOME stays real, a fake one logs the session
-#       out) greets that companion by name; /buddy use default returns
+#   (i) /buddy-personality opens the menu pane, the Professor marked; Down
+#       moves the preview to the next entry; Esc closes it and changes nothing;
+#       Enter on cat draws the cat and /buddy list marks it; /buddy use
+#       default returns. HOME stays real (a fake one logs the session out), so
+#       no row reads or prints the "Yours" group: hook tests prove that path.
 # Prints a table, one row per check, and exits 1 when any check fails,
 # 2 when the session could not be driven (no transcript, a turn timed out).
 # Spends real tokens: a few cents of Haiku. It resets this plugin's own
@@ -161,17 +163,42 @@ if ! shows_any "$RUN/professor.rows"; then add "(h) /buddy off hides" PASS "$out
 out=$(command_out "/buddy on"); sleep 3
 if shows_any "$RUN/professor.rows"; then add "(h) /buddy on shows" PASS "$out"; else add "(h) /buddy on shows" FAIL "not drawn"; fi
 
-FAKE=$ROOT/tests/fixtures/claude-json-fake.json
-NAME=$(jq -r '.companion.name' "$FAKE")
-out=$(command_out "/buddy adopt from $FAKE")
-b=$(bubble)
-if grep -q -F "$NAME the " <<<"$out" && grep -q -F "is back." <<<"$out"; then add "(i) /buddy adopt from a fake config" PASS "$out"; else add "(i) /buddy adopt from a fake config" FAIL "$out"; fi
-if grep -q -F "Welcome back, $NAME" <<<"$b"; then add "(i) the bubble greets $NAME" PASS "$b"; else add "(i) the bubble greets $NAME" FAIL "bubble: $b"; fi
-pane > "$RUN/i.txt"
-# The invented account rolls a common snail; its shell row has no eyes, so it reads the same in every frame.
-if grep -q -F "( '@' )" "$RUN/i.txt"; then add "(i) the adopted snail is drawn" PASS "shell row in the pane"; else add "(i) the adopted snail is drawn" FAIL "no snail row in the pane"; fi
+# The menu lists characters/ sorted by id: Up from the Professor's row reaches cat.
+IDS=$(ls "$CHARS"/*.json | xargs -n1 basename | sed 's/\.json$//' | sort)
+PICK=cat
+grep -q -x "$PICK" <<<"$IDS" || { echo "ERROR no $PICK.json in $CHARS"; exit 2; }
+ups=$(( $(grep -n -x professor <<<"$IDS" | cut -d: -f1) - $(grep -n -x "$PICK" <<<"$IDS" | cut -d: -f1) ))
+NEXT=$(grep -A1 -x professor <<<"$IDS" | tail -1)
+rows_of "$PICK" | grep -v -x -F -f "$RUN/professor.rows" > "$RUN/pick.rows"
+# The start of a persona as the preview's one line shows it.
+persona_of() { jq -r '.persona | gsub("\\s+"; " ") | .[0:40]' "$CHARS/$1.json"; }
+PROF_NAME=$(jq -r '.name' "$CHARS/professor.json")
+in_pane() { pane | grep -q -F -- "$1"; }
+out=$(command_out "/buddy-personality"); sleep 3
+pane > "$RUN/i-open.txt"
+if in_pane "* $PROF_NAME (professor)" && in_pane "Shipped" && in_pane "Your folder" && in_pane "$(persona_of professor)"; then
+  add "(i) /buddy-personality opens the menu" PASS "$out"
+else add "(i) /buddy-personality opens the menu" FAIL "$out / pane in $RUN/i-open.txt"; fi
+$T send-keys -t proof Down; sleep 2
+pane > "$RUN/i-down.txt"
+if in_pane "$(persona_of "$NEXT")" && ! in_pane "$(persona_of professor)"; then add "(i) Down moves the preview to $NEXT" PASS "preview shows the $NEXT persona"
+else add "(i) Down moves the preview to $NEXT" FAIL "pane in $RUN/i-down.txt"; fi
+$T send-keys -t proof Escape; sleep 2
+pane > "$RUN/i-esc.txt"
+if ! in_pane "$(persona_of "$NEXT")" && ! in_pane "Your folder" && shows_any "$RUN/professor.rows"; then add "(i) Esc closes it, nothing changed" PASS "pane gone, the Professor still drawn"
+else add "(i) Esc closes it, nothing changed" FAIL "pane in $RUN/i-esc.txt"; fi
+command_out "/buddy-personality" >/dev/null; sleep 3
+for _ in $(seq 1 "$ups"); do $T send-keys -t proof Up; sleep 0.5; done
+sleep 1
+if in_pane "$(persona_of "$PICK")"; then pre=ok; else pre="no $PICK preview"; fi
+$T send-keys -t proof Enter; sleep 3
+pane > "$RUN/i-pick.txt"
+if [ "$pre" = ok ] && shows_any "$RUN/pick.rows" && ! in_pane "Your folder"; then add "(i) Enter on $PICK draws it, pane closed" PASS "$PICK sprite row in the pane"
+else add "(i) Enter on $PICK draws it, pane closed" FAIL "$pre / pane in $RUN/i-pick.txt"; fi
+out=$(command_out "/buddy list")
+if grep -q "\* $PICK " <<<"$out"; then add "(i) /buddy list marks $PICK" PASS "$(grep -o "\* $PICK[^*]*" <<<"$out" | head -c 60)"; else add "(i) /buddy list marks $PICK" FAIL "$out"; fi
 out=$(command_out "/buddy use default"); sleep 3
-if shows_any "$RUN/professor.rows"; then add "(i) /buddy use default leaves it" PASS "$out"; else add "(i) /buddy use default leaves it" FAIL "$out"; fi
+if shows_any "$RUN/professor.rows"; then add "(i) /buddy use default returns" PASS "$out"; else add "(i) /buddy use default returns" FAIL "$out"; fi
 
 cp "$(transcript)" "$RUN/main.jsonl"
 echo

@@ -2,7 +2,7 @@ import { POSES, fail, Invalid, isObject, parseLines, type Frame, type LineEvent,
 import { HATS, SPECIES, type Hat, type Species } from './hatch.ts';
 
 // A species template (species/{species}.json) and the hat art (species/hats.json):
-// the sprite an adopted companion wears before its eye, hat and color are
+// the sprite an original companion wears before its eye, hat and color are
 // filled in. The contract of schema/species.schema.json, checked field by
 // field so an artist reads the first thing wrong, by its path.
 

@@ -26,9 +26,9 @@ export type Character = {
   motion: Motion;
   width: number;
   height: number;
-  /** An adopted companion: the sprite color cycles through the rainbow each tick. */
+  /** An original companion: the sprite color cycles through the rainbow each tick. */
   shiny?: boolean;
-  /** An adopted companion: the hover card's second line, and the rows below its stats line. */
+  /** An original companion: the hover card's second line, and the rows below its stats line. */
   card?: { subtitle: string; rows: readonly string[] };
 };
 

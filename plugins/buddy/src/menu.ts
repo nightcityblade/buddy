@@ -1,0 +1,132 @@
+import { frameAt, type Character } from './character.ts';
+import type { Variant } from './hatch.ts';
+import { poolFor } from './lines.ts';
+import { ORIGINAL_ID, SHOWN_CONFIG, originalLabel, type Soul } from './original.ts';
+import type { Entry, Roster } from './roster.ts';
+import { spriteColor } from './scene.ts';
+
+// `/buddy-personality`: the menu as plain data. Three titled groups of
+// entries, one focusable row each, and the preview of the one the focus is
+// on. The adapter draws it one to one; an error is a line in its group.
+
+export const MENU_COMMAND = 'buddy-personality';
+export const MENU_PANE = 'buddy-personality';
+export const MENU_TITLE = 'Pick a personality';
+/** How often the preview's idle frames turn. */
+export const PREVIEW_MS = 500;
+export const MENU_MAX_ROWS = 30;
+export const PREVIEW_ROWS = 14;
+
+export type Pick = { kind: 'use'; id: string } | { kind: 'original'; variant: Variant };
+export type Item = { key: string; label: string; pick: Pick; character?: Character; error?: string };
+/** A titled group: its rows, and lines said in place of rows (an error, an empty group). */
+export type Section = { title: string; lines: string[]; items: Item[] };
+export type Menu = { sections: Section[] };
+
+/** What the "Yours" group found: a failure to look, nothing, or the companion rolled both ways. */
+export type Originals =
+  | { kind: 'error'; error: string }
+  | { kind: 'none'; notes: string[] }
+  | { kind: 'found'; soul: Soul; from?: string; notes: string[]; rolls: { variant: Variant; character?: Character; error?: string }[] };
+
+export type MenuInput = {
+  roster: Roster;
+  /** Why the plugin's characters/ could not be listed, if it could not. */
+  shippedError?: string;
+  /** Whether a characterDir is set, and why it could not be listed. */
+  folder: { isSet: boolean; error?: string };
+  originals: Originals;
+};
+
+export function itemKey(p: Pick): string {
+  return p.kind === 'use' ? `use:${p.id}` : `original:${p.variant}`;
+}
+
+function entryItem(e: Entry): Item {
+  const pick: Pick = { kind: 'use', id: e.id };
+  return e.character ? { key: itemKey(pick), label: `${e.character.name} (${e.id})`, pick, character: e.character } : { key: itemKey(pick), label: `${e.id} (invalid)`, pick, error: e.error ?? 'invalid' };
+}
+
+function yours(o: Originals): Section {
+  const title = 'Yours';
+  if (o.kind === 'error') return { title, lines: [o.error], items: [] };
+  if (o.kind === 'none') return { title, lines: [`No companion in ${SHOWN_CONFIG} or its backups.`, ...o.notes], items: [] };
+  const items = o.rolls.map((r): Item => {
+    const pick: Pick = { kind: 'original', variant: r.variant };
+    const item: Item = { key: itemKey(pick), label: originalLabel(o.soul.name, r.variant), pick };
+    if (r.character) item.character = r.character;
+    else item.error = r.error ?? 'no art for it';
+    return item;
+  });
+  return { title, lines: [...(o.from ? [`From the backup ${o.from}.`] : []), ...o.notes], items };
+}
+
+export function buildMenu(i: MenuInput): Menu {
+  const shipped = i.roster.entries.filter((e) => e.source === 'builtin').map(entryItem);
+  const mine = i.roster.entries.filter((e) => e.source === 'user').map(entryItem);
+  const shippedLines = i.shippedError ? [i.shippedError] : shipped.length === 0 ? ['No shipped characters found.'] : [];
+  const folderLines = !i.folder.isSet ? ['No folder set: the characterDir option names one.'] : i.folder.error ? [i.folder.error] : mine.length === 0 ? ['No character files in your folder.'] : [];
+  return {
+    sections: [
+      { title: 'Shipped', lines: shippedLines, items: shipped },
+      yours(i.originals),
+      { title: 'Your folder', lines: folderLines, items: mine },
+    ],
+  };
+}
+
+export function allItems(m: Menu): Item[] {
+  return m.sections.flatMap((s) => s.items);
+}
+
+export function findItem(m: Menu, key: string): Item | undefined {
+  return allItems(m).find((i) => i.key === key);
+}
+
+/** The key `by` rows from `key`, kept inside the list: what Down (+1) and Up (-1) reach. */
+export function moveKey(m: Menu, key: string, by: number): string | undefined {
+  const items = allItems(m);
+  if (items.length === 0) return undefined;
+  const at = Math.max(0, items.findIndex((i) => i.key === key));
+  return items[Math.max(0, Math.min(items.length - 1, at + by))]!.key;
+}
+
+/** The entry drawn now: the original by its roll, any other by its id. */
+export function currentKeyOf(drawnId: string, originalVariant: Variant | undefined): string {
+  return drawnId === ORIGINAL_ID && originalVariant ? itemKey({ kind: 'original', variant: originalVariant }) : itemKey({ kind: 'use', id: drawnId });
+}
+
+/** A row's text: `* ` on the one drawn now. */
+export function rowLabel(item: Item, current: string): string {
+  return `${item.key === current ? '* ' : '  '}${item.label}`;
+}
+
+/** The rows the pane wants: every title, line and entry, a gap between groups. */
+export function menuRows(m: Menu): number {
+  const left = m.sections.reduce((n, s) => n + 1 + s.lines.length + s.items.length, 0) + m.sections.length - 1;
+  return Math.min(MENU_MAX_ROWS, Math.max(left, PREVIEW_ROWS));
+}
+
+export type Preview =
+  | { kind: 'character'; rows: string[]; color: string; name: string; persona: string; sample: string; card: string[] }
+  | { kind: 'error'; label: string; error: string };
+
+function oneLine(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+/** What the right side shows for `item`: its idle frame `frame`, name, persona, greeting and card; or why it cannot. */
+export function previewOf(item: Item | undefined, frame: number, now: number): Preview {
+  if (!item) return { kind: 'error', label: 'Nothing to preview', error: 'no entry is highlighted' };
+  const c = item.character;
+  if (!c) return { kind: 'error', label: item.label, error: item.error ?? 'invalid' };
+  return {
+    kind: 'character',
+    rows: [...frameAt(c, 'idle', frame)],
+    color: spriteColor(c, now),
+    name: c.name,
+    persona: oneLine(c.persona),
+    sample: poolFor(c, 'greeting')[0] ?? '',
+    card: c.card ? [c.card.subtitle, ...c.card.rows] : [],
+  };
+}
