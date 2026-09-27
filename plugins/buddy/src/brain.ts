@@ -40,6 +40,8 @@ export type Brain = {
   lastQuipAt: number | null;
   /** The pose last drawn: a new pose starts at its first frame. */
   lastPose: Pose | null;
+  /** Canned lines said since the adapter last took them, with who said them: its memory records the shown ones. The thinking filler is never among them. */
+  said: { id: string; text: string }[];
 };
 
 export function createBrain(character: Character, walkOption: boolean): Brain {
@@ -61,6 +63,7 @@ export function createBrain(character: Character, walkOption: boolean): Brain {
     turn: { tools: [], failures: 0, lastBash: '' },
     lastQuipAt: null,
     lastPose: null,
+    said: [],
   };
 }
 
@@ -80,6 +83,8 @@ export function speak(b: Brain, text: string, pose: Pose | null, ms: number): vo
 export function sayLine(b: Brain, event: LineEvent, pose: Pose | null, ms: number, rand: () => number): void {
   const line = pickLine(poolFor(b.character, event), b.lastLines[event], rand);
   b.lastLines[event] = line;
+  // The thinking filler shown while a question waits is noise, never remembered.
+  if (event !== 'thinking') b.said.push({ id: b.character.id, text: line });
   speak(b, line, pose, ms);
 }
 
@@ -221,6 +226,7 @@ export function sceneOf(b: Brain): Scene | null {
     sleeping: b.sleeping,
     zTick: b.motion.stillFrame,
     stats: { pets: b.pets, questions: b.questions },
+    now: b.now,
   });
   if (scene && scene.x !== b.motion.x) b.motion = { ...b.motion, x: scene.x };
   return scene;

@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "blob",
+  "width": 9,
+  "hatCol": 4,
+  "poses": {
+    "idle": [
+      [
+        "         ",
+        "  .---.  ",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        " '-----' "
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        " '-----' "
+      ],
+      [
+        "         ",
+        "  .~-~.  ",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        " '~---~' "
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        " '-----' "
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        " '-----' "
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " ( - - ) ",
+        "(  \\_/  )",
+        " '-----' "
+      ]
+    ],
+    "walkRight": [
+      [
+        "         ",
+        "  .---.  ",
+        " ( {E} {E} ) ",
+        " ( \\_/ ) ",
+        " '-----' "
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        "'-------'"
+      ]
+    ],
+    "oops": [
+      [
+        "         ",
+        "  .---. !",
+        " ( {E} {E} ) ",
+        "(   o   )",
+        " '-----' "
+      ],
+      [
+        "         ",
+        " !.---.  ",
+        " ( {E} {E} ) ",
+        "(   o   )",
+        " '~---~' "
+      ]
+    ],
+    "yay": [
+      [
+        "         ",
+        "\\ .---. /",
+        " ( {E} {E} ) ",
+        "(  \\_/  )",
+        " '-----' "
+      ],
+      [
+        "         ",
+        "* .---. *",
+        " ( {E} {E} ) ",
+        "( \\___/ )",
+        "'-------'"
+      ]
+    ],
+    "sleep": [
+      [
+        "         ",
+        "  .---. z",
+        " ( - - ) ",
+        "(   ~   )",
+        "'-------'"
+      ],
+      [
+        "         ",
+        "  .---. z",
+        " ( - - ) ",
+        "(   ~   )",
+        "'-------'"
+      ],
+      [
+        "         ",
+        "  .---. Z",
+        " ( - - ) ",
+        "(   ~   )",
+        "'-------'"
+      ],
+      [
+        "         ",
+        "  .---. Z",
+        " ( - - ) ",
+        "(   ~   )",
+        "'-------'"
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Blorp! {name} is here.",
+      "Hello! I've been wobbling with excitement.",
+      "Squish squish. Ready when you are."
+    ],
+    "toolFail": [
+      "Blorp. That didn't stick. Let's try again.",
+      "Oof, a wobble. I'll absorb the shock.",
+      "Squish. Errors bounce right off me."
+    ],
+    "testPass": [
+      "Green! Happy jiggle!",
+      "Blorp blorp! All tests passing!",
+      "I'm so proud I could ooze."
+    ],
+    "testFail": [
+      "Hmm, a red one. Let's soak it in and read.",
+      "A wobbly test. We'll firm it up.",
+      "Squish. First failure first."
+    ],
+    "petted": [
+      "Squishy! Thank you!",
+      "Hee. That tickles my whole body.",
+      "Blorp. Best pat ever."
+    ],
+    "thinking": [
+      "Letting the idea soak in...",
+      "Wobbling on it.",
+      "Blorp... processing."
+    ],
+    "rest": [
+      "Melting a little. It's fine.",
+      "Puddle mode, briefly.",
+      "Just settling into a comfy shape."
+    ],
+    "working": [
+      "I'll sit here and jiggle quietly.",
+      "Go on. I'm absorbing everything.",
+      "Soft support, activated."
+    ],
+    "wake": [
+      "Blorp?! I was a puddle for a second.",
+      "Oh! Reshaping. Hi!",
+      "Awake and round again."
+    ],
+    "farewell": [
+      "Bye! Wobbles until next time.",
+      "Blorp. I'll keep your seat squishy.",
+      "See you! Stay flexible."
+    ]
+  }
+}

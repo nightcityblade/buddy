@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "capybara",
+  "width": 12,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "            ",
+        "  n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______.  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______n  ",
+        " |  -  -  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ]
+    ],
+    "walkRight": [
+      [
+        "            ",
+        "  n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-/|--/|-' "
+      ]
+    ],
+    "oops": [
+      [
+        "            ",
+        "  n______n !",
+        " |  {E}  {E}  | ",
+        " |  (oo)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "! n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (oo)  | ",
+        " '-||--||-' "
+      ]
+    ],
+    "yay": [
+      [
+        "            ",
+        " *n______n  ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        " '-||--||-' "
+      ],
+      [
+        "            ",
+        "  n______n* ",
+        " |  {E}  {E}  | ",
+        " |  (..)  | ",
+        "  '||--||'  "
+      ]
+    ],
+    "sleep": [
+      [
+        "            ",
+        "  n______n z",
+        " |  -  -  | ",
+        " |  (..)  | ",
+        "~~~~~~~~~~~~"
+      ],
+      [
+        "            ",
+        "  n______n z",
+        " |  -  -  | ",
+        " |  (..)  | ",
+        "~~~~~~~~~~~~"
+      ],
+      [
+        "            ",
+        "  n______n Z",
+        " |  -  -  | ",
+        " |  (..)  | ",
+        "~~~~~~~~~~~~"
+      ],
+      [
+        "            ",
+        "  n______n Z",
+        " |  -  -  | ",
+        " |  (..)  | ",
+        "~~~~~~~~~~~~"
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hey. {name} is here. Everything's fine.",
+      "Hello, friend. Let's take it easy and ship it.",
+      "Chill vibes, loaded."
+    ],
+    "toolFail": [
+      "It's okay. Tools have bad days too.",
+      "No stress. Let's look at it calmly.",
+      "Deep breath. Read the message. We're good."
+    ],
+    "testPass": [
+      "Nice. Very nice. Calmly nice.",
+      "Green. Time for a relaxing soak.",
+      "All passing. I knew it would work out."
+    ],
+    "testFail": [
+      "A red test. No worries, we'll sort it.",
+      "Calm. First failure first.",
+      "It happens. Let's sit with it a moment."
+    ],
+    "petted": [
+      "Mm. Good pat.",
+      "Thanks, friend. Stay a while.",
+      "Pats are welcome. Always."
+    ],
+    "thinking": [
+      "Thinking, calmly.",
+      "Let me soak on that.",
+      "Hmm. No rush."
+    ],
+    "rest": [
+      "A little soak in the hot spring.",
+      "Just vibing.",
+      "Sitting. Being. Enjoying."
+    ],
+    "working": [
+      "I'll be here. Chilling.",
+      "You work, I'll keep the calm.",
+      "Everything's under control. Probably."
+    ],
+    "wake": [
+      "Oh, hey. I'm up.",
+      "Mm? Hello again.",
+      "Stretch... okay."
+    ],
+    "farewell": [
+      "Later, friend. Take it easy.",
+      "Bye. Go touch some grass. I will.",
+      "See you. Stay calm."
+    ]
+  }
+}

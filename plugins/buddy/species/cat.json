@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "cat",
+  "width": 11,
+  "hatCol": 4,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        " (\")_(\")~  "
+      ],
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        " (\")_(\")~  "
+      ],
+      [
+        "           ",
+        " /\\___/|   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        " (\")_(\")_/ "
+      ],
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        " (\")_(\")~  "
+      ],
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        " (\")_(\")~  "
+      ],
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  - -  )  ",
+        " \\  ^  /   ",
+        " (\")_(\")~  "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        "(\")  (\") ~ "
+      ],
+      [
+        "           ",
+        " /\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\  ^  /   ",
+        "  (\")(\")_/ "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        " /\\___/\\ ! ",
+        "(  {E} {E}  )  ",
+        " \\  o  /   ",
+        " (\")_(\")~  "
+      ],
+      [
+        "           ",
+        " /|___|\\  !",
+        "(  {E} {E}  )  ",
+        " \\  o  /   ",
+        " (\")_(\")~  "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        " /\\___/\\ * ",
+        "(  {E} {E}  )  ",
+        " \\ \\_/ /   ",
+        " (\")_(\")/  "
+      ],
+      [
+        "           ",
+        "*/\\___/\\   ",
+        "(  {E} {E}  )  ",
+        " \\ \\_/ /   ",
+        " (\")_(\")~  "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "         z ",
+        " /\\___/\\   ",
+        "(  - -  )  ",
+        " \\__^__/~  "
+      ],
+      [
+        "           ",
+        "         z ",
+        " /\\___/\\   ",
+        "(  - -  )  ",
+        " \\__^__/~  "
+      ],
+      [
+        "           ",
+        "        Z  ",
+        " /\\___/\\   ",
+        "(  - -  )  ",
+        " \\__^__/~  "
+      ],
+      [
+        "           ",
+        "        Z  ",
+        " /\\___/\\   ",
+        "(  - -  )  ",
+        " \\__^__/~  "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Oh. It's you. Fine, {name} will allow it.",
+      "There you are. My bowl was starting to worry.",
+      "I was here first. As always."
+    ],
+    "toolFail": [
+      "I'd have knocked that off the table too.",
+      "Hm. The tool displeased me. Try again.",
+      "Not purr-fect. Look closer."
+    ],
+    "testPass": [
+      "Acceptable. You may continue.",
+      "Green. I'm not impressed. (I'm a little impressed.)",
+      "Purr. That's the sound of approval."
+    ],
+    "testFail": [
+      "A red test. I'll stare at it until it confesses.",
+      "Mrrp. Something's off. Check the first one.",
+      "I see a failure. I also see a sunbeam. Priorities."
+    ],
+    "petted": [
+      "...Purr. Don't tell anyone.",
+      "Behind the ears. Yes. There.",
+      "One more. Then I'll pretend I didn't like it."
+    ],
+    "thinking": [
+      "Staring at nothing. Thinking.",
+      "Hm. Let me bat this idea around.",
+      "Pondering, loaf-style."
+    ],
+    "rest": [
+      "Loafing. Do not disturb.",
+      "A small bath. Very important.",
+      "This sunbeam is mine now."
+    ],
+    "working": [
+      "I'll sit on the warm part of the laptop.",
+      "Watching your cursor. Very suspicious.",
+      "Carry on, human."
+    ],
+    "wake": [
+      "Mrrp? I wasn't asleep. I was supervising.",
+      "You woke me. You owe me a treat.",
+      "Stretch. Yawn. Okay, I'm here."
+    ],
+    "farewell": [
+      "Leaving? Fine. I'll sit in your chair.",
+      "Bye. Bring snacks next time.",
+      "I'll be here. Obviously."
+    ]
+  }
+}

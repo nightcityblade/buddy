@@ -2,19 +2,31 @@
 # Live proof: drives a real interactive Claude Code session (Haiku) in tmux on
 # a private socket, with this checkout loaded by --plugin-dir, and reads the
 # band from the pane and the /buddy replies from the transcript:
-#   (a) the Professor is drawn above the prompt
-#   (b) he walks: the band changes between samples while nothing is said
-#   (c) /buddy pets him and counts; /buddy list marks him with *
+#   (a) the default character, the duck, is drawn above the prompt
+#   (b) it walks: the band changes between samples while nothing is said
+#   (c) /buddy pets it and counts; /buddy-personality marks it with *
 #   (d) a /buddy question before the first reply (nothing to fork, so the
 #       quip model answers) fills the bubble with an answer
 #   (e) a Bash run printing a test pass shows a testPass line
 #   (f) a /buddy question after a reply (a fork of the chat) is answered
-#   (g) /buddy use {another} draws another character; use default returns
+#   (g) Enter on another character in /buddy-personality draws it, and the
+#       reopened menu marks it with *; picking the duck there returns
 #   (h) /buddy off hides the band; /buddy on brings it back
+#   (i) /buddy-personality opens the menu pane, the duck marked; Down
+#       moves the preview to the next entry; Esc closes it and changes nothing;
+#       Enter on cat draws the cat and the reopened menu marks it; picking
+#       the duck returns. HOME stays real (a fake one logs the session out), so
+#       no row reads or prints the "Yours" group: hook tests prove that path.
+#   (j) memory: /buddy remember the word pineapple, then /buddy what word did I
+#       ask you to remember? is answered with pineapple; the plugin's store
+#       holds both as exchanges, no thinking filler (its memory:{session} key,
+#       nothing else read)
 # Prints a table, one row per check, and exits 1 when any check fails,
 # 2 when the session could not be driven (no transcript, a turn timed out).
 # Spends real tokens: a few cents of Haiku. It resets this plugin's own
-# /buddy on and /buddy use choices (the --plugin-dir copy, buddy@inline).
+# /buddy on and /buddy-personality choices (the --plugin-dir copy,
+# buddy@inline). --setting-sources project keeps the user's own settings, and
+# so their character option, out of the run.
 set -uo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -29,8 +41,10 @@ fi
 [ -x "$CLAUDE_BIN" ] || { echo "ERROR no claude binary found (set CLAUDE_BIN)"; exit 2; }
 command -v tmux >/dev/null || { echo "ERROR tmux not found"; exit 2; }
 command -v jq >/dev/null || { echo "ERROR jq not found"; exit 2; }
-[ -f "$CHARS/professor.json" ] || { echo "ERROR $CHARS/professor.json not found"; exit 2; }
-OTHER=$(ls "$CHARS"/*.json | xargs -n1 basename | sed 's/\.json$//' | grep -v '^professor$' | head -1)
+# The plugin's default character (DEFAULT_ID); OTHER is the first other one by id.
+DEFAULT=duck
+[ -f "$CHARS/$DEFAULT.json" ] || { echo "ERROR $CHARS/$DEFAULT.json not found"; exit 2; }
+OTHER=$(ls "$CHARS"/*.json | xargs -n1 basename | sed 's/\.json$//' | grep -v -x "$DEFAULT" | head -1)
 [ -n "$OTHER" ] || { echo "ERROR no second character in $CHARS"; exit 2; }
 
 RUN=/tmp/buddy/run-$(date +%Y%m%dT%H%M%S)
@@ -49,10 +63,10 @@ echo "run dir: $RUN  session: $ID"
 # Distinctive sprite rows of a character (4+ visible characters), and a line pool.
 rows_of() { jq -r '[.poses[][][]] | map(gsub("^ +| +$"; "")) | map(select(length >= 4)) | unique[]' "$CHARS/$1.json"; }
 pool_of() { jq -r --arg e "$2" '.lines[$e][]? | gsub(" +"; " ")' "$CHARS/$1.json"; }
-rows_of professor > "$RUN/professor.rows"
-rows_of "$OTHER" | grep -v -x -F -f "$RUN/professor.rows" > "$RUN/other.rows"
-pool_of professor thinking > "$RUN/thinking.pool"
-pool_of professor testPass > "$RUN/testpass.pool"
+rows_of "$DEFAULT" > "$RUN/default.rows"
+rows_of "$OTHER" | grep -v -x -F -f "$RUN/default.rows" > "$RUN/other.rows"
+pool_of "$DEFAULT" thinking > "$RUN/thinking.pool"
+pool_of "$DEFAULT" testPass > "$RUN/testpass.pool"
 [ -s "$RUN/testpass.pool" ] || printf '%s\n' 'Tests pass!' 'All green.' 'It passes. Nice.' > "$RUN/testpass.pool"
 [ -s "$RUN/thinking.pool" ] || printf '%s\n' 'Let me think...' 'Hmm...' 'One moment...' > "$RUN/thinking.pool"
 
@@ -106,6 +120,48 @@ answered() {
   echo "TIMEOUT: $(bubble)"; return 1
 }
 
+# The menu: Shipped lists characters/ sorted by id; the highlight opens on the
+# marked (*) entry, the one drawn now.
+IDS=$(ls "$CHARS"/*.json | xargs -n1 basename | sed 's/\.json$//' | sort)
+# The start of a description as the preview's one line shows it (never the persona).
+about_of() { jq -r '.description | gsub("\\s+"; " ") | .[0:40]' "$CHARS/$1.json"; }
+persona_of() { jq -r '.persona | gsub("\\s+"; " ") | .[0:40]' "$CHARS/$1.json"; }
+name_of() { jq -r '.name' "$CHARS/$1.json"; }
+DEF_NAME=$(name_of "$DEFAULT")
+in_pane() { pane | grep -q -F -- "$1"; }
+index_of() { grep -n -x -- "$1" <<<"$IDS" | cut -d: -f1; }
+# The newest menu's Shipped group as drawn, or nothing when no menu is drawn.
+shipped() { pane | awk '/Shipped/ { buf = ""; on = 1 } on { buf = buf $0 "\n" } /Yours/ { on = 0 } END { printf "%s", buf }'; }
+# The shipped id the open menu marks with *, or nothing.
+marked() { local id g; g=$(shipped); for id in $IDS; do grep -q -F -- "* $(name_of "$id") ($id)" <<<"$g" && { echo "$id"; return 0; }; done; return 1; }
+# Opens /buddy-personality and says which shipped entry it marks; Esc closes it.
+menu_mark() {
+  local m
+  command_out "/buddy-personality" >/dev/null; sleep 3
+  m=$(marked); pane > "$RUN/menu-$1.txt"
+  $T send-keys -t proof Escape; sleep 2
+  echo "$m"
+}
+# Opens /buddy-personality, moves from the marked entry to $1 (Up or Down), Enter.
+# Fails loudly when the marked entry is not a shipped one: the steps are unknown.
+menu_pick() {
+  local from n key
+  command_out "/buddy-personality" >/dev/null; sleep 3
+  from=$(marked) || { pane > "$RUN/menu-unmarked.txt"; echo "ERROR /buddy-personality marks no shipped character; pane in $RUN/menu-unmarked.txt" >&2; exit 2; }
+  n=$(( $(index_of "$1") - $(index_of "$from") )); key=Down
+  [ "$n" -lt 0 ] && { n=$(( -n )); key=Up; }
+  for _ in $(seq 1 "$n"); do $T send-keys -t proof "$key"; sleep 0.5; done
+  sleep 1
+  # A key the pane dropped leaves the highlight short: one more at a time, up to 3.
+  for _ in 1 2 3; do
+    [ "$n" -gt 0 ] && ! in_pane "$(about_of "$1")" || break
+    log "no $1 preview after $n $key; one more"; $T send-keys -t proof "$key"; n=$((n + 1)); sleep 1
+  done
+  in_pane "$(about_of "$1")" || { pane > "$RUN/menu-to-$1.txt"; log "no $1 preview after $n $key"; }
+  $T send-keys -t proof Enter; sleep 3
+  log "picked $1 from $from"
+}
+
 fail=0
 row() { local name=$1 verdict=$2 got=$3; printf '| %-46s | %-4s | %s |\n' "$name" "$verdict" "${got:0:90}"; }
 results=()
@@ -113,19 +169,18 @@ results=()
 add() { [ "$2" = PASS ] || fail=1; results+=("$(row "$@")"); }
 
 command_out "/buddy on" >/dev/null
-command_out "/buddy use default" >/dev/null
-sleep 2
-if shows_any "$RUN/professor.rows"; then add "(a) the Professor is drawn" PASS "sprite row in the pane"; else add "(a) the Professor is drawn" FAIL "no professor row"; fi
+menu_pick "$DEFAULT"
+if shows_any "$RUN/default.rows"; then add "(a) the default ($DEFAULT) is drawn" PASS "sprite row in the pane"; else add "(a) the default ($DEFAULT) is drawn" FAIL "no $DEFAULT row"; fi
 pane > "$RUN/a.txt"
 
 sleep 8
-s1=$(pane | grep -F -f "$RUN/professor.rows"); sleep 2; s2=$(pane | grep -F -f "$RUN/professor.rows"); sleep 2; s3=$(pane | grep -F -f "$RUN/professor.rows")
-if [ -n "$s1" ] && { [ "$s1" != "$s2" ] || [ "$s2" != "$s3" ]; }; then add "(b) he walks" PASS "the band changed across samples"; else add "(b) he walks" FAIL "no change in 4 s"; fi
+s1=$(pane | grep -F -f "$RUN/default.rows"); sleep 2; s2=$(pane | grep -F -f "$RUN/default.rows"); sleep 2; s3=$(pane | grep -F -f "$RUN/default.rows")
+if [ -n "$s1" ] && { [ "$s1" != "$s2" ] || [ "$s2" != "$s3" ]; }; then add "(b) it walks" PASS "the band changed across samples"; else add "(b) it walks" FAIL "no change in 4 s"; fi
 
 out=$(command_out "/buddy")
 if grep -q -E ': [0-9]+ pets' <<<"$out"; then add "(c) /buddy pets" PASS "$out"; else add "(c) /buddy pets" FAIL "$out"; fi
-out=$(command_out "/buddy list")
-if grep -q '\* professor' <<<"$out"; then add "(c) /buddy list marks the current one" PASS "$(grep -o '\* professor[^*]*' <<<"$out" | head -c 60)"; else add "(c) /buddy list marks the current one" FAIL "$out"; fi
+m=$(menu_mark c)
+if [ "$m" = "$DEFAULT" ]; then add "(c) /buddy-personality marks the current one" PASS "* $DEF_NAME ($DEFAULT)"; else add "(c) /buddy-personality marks the current one" FAIL "marked: ${m:-none}; pane in $RUN/menu-c.txt"; fi
 
 out=$(command_out "/buddy what is your favourite tool")
 got=$(answered); v=$?
@@ -147,16 +202,65 @@ out=$(command_out "/buddy what did we just run")
 got=$(answered); v=$?
 [ $v -eq 0 ] && add "(f) question after a reply (fork)" PASS "$got" || add "(f) question after a reply (fork)" FAIL "$out / $got"
 
-out=$(command_out "/buddy use $OTHER")
-sleep 3
-if shows_any "$RUN/other.rows"; then add "(g) /buddy use $OTHER draws it" PASS "$out"; else add "(g) /buddy use $OTHER draws it" FAIL "$out"; fi
-out=$(command_out "/buddy use default"); sleep 3
-if shows_any "$RUN/professor.rows"; then add "(g) /buddy use default returns" PASS "$out"; else add "(g) /buddy use default returns" FAIL "$out"; fi
+menu_pick "$OTHER"
+if shows_any "$RUN/other.rows"; then add "(g) a menu pick of $OTHER draws it" PASS "$OTHER sprite row in the pane"; else add "(g) a menu pick of $OTHER draws it" FAIL "no $OTHER row"; fi
+m=$(menu_mark g)
+if [ "$m" = "$OTHER" ]; then add "(g) reopened, the menu marks $OTHER" PASS "* $(name_of "$OTHER") ($OTHER)"; else add "(g) reopened, the menu marks $OTHER" FAIL "marked: ${m:-none}; pane in $RUN/menu-g.txt"; fi
+menu_pick "$DEFAULT"
+if shows_any "$RUN/default.rows"; then add "(g) picking the default returns" PASS "$DEFAULT sprite row in the pane"; else add "(g) picking the default returns" FAIL "no $DEFAULT row"; fi
 
 out=$(command_out "/buddy off"); sleep 3
-if ! shows_any "$RUN/professor.rows"; then add "(h) /buddy off hides" PASS "$out"; else add "(h) /buddy off hides" FAIL "still drawn"; fi
+if ! shows_any "$RUN/default.rows"; then add "(h) /buddy off hides" PASS "$out"; else add "(h) /buddy off hides" FAIL "still drawn"; fi
 out=$(command_out "/buddy on"); sleep 3
-if shows_any "$RUN/professor.rows"; then add "(h) /buddy on shows" PASS "$out"; else add "(h) /buddy on shows" FAIL "not drawn"; fi
+if shows_any "$RUN/default.rows"; then add "(h) /buddy on shows" PASS "$out"; else add "(h) /buddy on shows" FAIL "not drawn"; fi
+
+# The menu lists characters/ sorted by id: Up from the default's row reaches cat.
+PICK=cat
+grep -q -x "$PICK" <<<"$IDS" || { echo "ERROR no $PICK.json in $CHARS"; exit 2; }
+ups=$(( $(grep -n -x "$DEFAULT" <<<"$IDS" | cut -d: -f1) - $(grep -n -x "$PICK" <<<"$IDS" | cut -d: -f1) ))
+NEXT=$(grep -A1 -x "$DEFAULT" <<<"$IDS" | tail -1)
+rows_of "$PICK" | grep -v -x -F -f "$RUN/default.rows" > "$RUN/pick.rows"
+out=$(command_out "/buddy-personality"); sleep 3
+pane > "$RUN/i-open.txt"
+if in_pane "* $DEF_NAME ($DEFAULT)" && in_pane "Shipped" && in_pane "Your folder" && in_pane "$(about_of "$DEFAULT")" && ! in_pane "$(persona_of "$DEFAULT")"; then
+  add "(i) /buddy-personality opens the menu" PASS "$out"
+else add "(i) /buddy-personality opens the menu" FAIL "$out / pane in $RUN/i-open.txt"; fi
+$T send-keys -t proof Down; sleep 2
+pane > "$RUN/i-down.txt"
+if in_pane "$(about_of "$NEXT")" && ! in_pane "$(about_of "$DEFAULT")"; then add "(i) Down moves the preview to $NEXT" PASS "preview shows the $NEXT description"
+else add "(i) Down moves the preview to $NEXT" FAIL "pane in $RUN/i-down.txt"; fi
+$T send-keys -t proof Escape; sleep 2
+pane > "$RUN/i-esc.txt"
+if ! in_pane "$(about_of "$NEXT")" && ! in_pane "Your folder" && shows_any "$RUN/default.rows"; then add "(i) Esc closes it, nothing changed" PASS "pane gone, $DEFAULT still drawn"
+else add "(i) Esc closes it, nothing changed" FAIL "pane in $RUN/i-esc.txt"; fi
+command_out "/buddy-personality" >/dev/null; sleep 3
+for _ in $(seq 1 "$ups"); do $T send-keys -t proof Up; sleep 0.5; done
+sleep 1
+if in_pane "$(about_of "$PICK")"; then pre=ok; else pre="no $PICK preview"; fi
+$T send-keys -t proof Enter; sleep 3
+pane > "$RUN/i-pick.txt"
+if [ "$pre" = ok ] && shows_any "$RUN/pick.rows" && ! in_pane "Your folder"; then add "(i) Enter on $PICK draws it, pane closed" PASS "$PICK sprite row in the pane"
+else add "(i) Enter on $PICK draws it, pane closed" FAIL "$pre / pane in $RUN/i-pick.txt"; fi
+m=$(menu_mark i)
+if [ "$m" = "$PICK" ]; then add "(i) reopened, the menu marks $PICK" PASS "* $(name_of "$PICK") ($PICK)"; else add "(i) reopened, the menu marks $PICK" FAIL "marked: ${m:-none}; pane in $RUN/menu-i.txt"; fi
+menu_pick "$DEFAULT"
+if shows_any "$RUN/default.rows"; then add "(i) picking the default returns" PASS "$DEFAULT sprite row in the pane"; else add "(i) picking the default returns" FAIL "no $DEFAULT row"; fi
+
+out=$(command_out "/buddy remember the word pineapple")
+got=$(answered); v=$?
+[ $v -eq 0 ] && grep -q 'Asked' <<<"$out" && add "(j) /buddy remember the word pineapple" PASS "$got" || add "(j) /buddy remember the word pineapple" FAIL "$out / $got"
+echo "$got" > "$RUN/j-first.txt"
+out=$(command_out "/buddy what word did I ask you to remember?")
+got=$(answered); v=$?
+echo "$got" > "$RUN/j-second.txt"
+if [ $v -eq 0 ] && grep -q -i 'pineapple' <<<"$got"; then add "(j) the next answer remembers pineapple" PASS "$got"; else add "(j) the next answer remembers pineapple" FAIL "$out / $got"; fi
+# This plugin's store (the --plugin-dir copy): only the key of this session is read.
+STORE=$(ls "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/store/buddy_inline-*.json 2>/dev/null | head -1)
+mem=$([ -n "$STORE" ] && jq -r --arg k "memory:$ID" --arg d "$DEFAULT" '.[$k].characters[$d][]? | if .kind == "question" then "question: \(.question) -> \(.answer // "(no answer)")" else "\(.kind): \(.text)" end' "$STORE" 2>&1)
+echo "$mem" > "$RUN/j-memory.txt"
+if grep -q -F 'question: remember the word pineapple -> ' <<<"$mem" && grep -q -F 'question: what word did I ask you to remember? -> ' <<<"$mem" && ! grep -q -F -f "$RUN/thinking.pool" <<<"$mem"; then
+  add "(j) the store holds this session's memory" PASS "$(grep -c . <<<"$mem") exchanges under memory:$ID, no thinking filler"
+else add "(j) the store holds this session's memory" FAIL "${STORE:-no buddy_inline store file}: $(head -c 80 <<<"$mem")"; fi
 
 cp "$(transcript)" "$RUN/main.jsonl"
 echo

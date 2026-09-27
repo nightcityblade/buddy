@@ -1,8 +1,8 @@
 {
   "name": "buddy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "A tiny companion that walks on your Claude Code prompt line and talks back — the Professor by default, more characters built in, or your own.",
+  "description": "A tiny companion that walks on your Claude Code prompt line and talks back — Quack the duck by default, more characters built in, or your own.",
   "type": "module",
   "license": "MIT",
   "engines": {

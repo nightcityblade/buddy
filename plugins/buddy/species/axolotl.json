@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "axolotl",
+  "width": 12,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\|.----.|/ ",
+        "~-( {E}  {E} )-~",
+        "/|( \\__/ )|\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( -  - )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ]
+    ],
+    "walkRight": [
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.// ",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "   |'--'|~~ "
+      ]
+    ],
+    "oops": [
+      [
+        "            ",
+        " \\\\.----.//!",
+        "=-( {E}  {E} )-=",
+        "//(  ()  )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        "!\\|.----.|/ ",
+        "=-( {E}  {E} )-=",
+        "//(  ()  )\\\\",
+        "  _/'--'\\_~ "
+      ]
+    ],
+    "yay": [
+      [
+        "            ",
+        "*\\\\.----.//*",
+        "=-( {E}  {E} )-=",
+        "//( \\__/ )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\|.----.|/ ",
+        "~=( {E}  {E} )=~",
+        "/|( \\__/ )|\\",
+        "   |'--'|~~ "
+      ]
+    ],
+    "sleep": [
+      [
+        "            ",
+        " \\\\.----.//z",
+        "=-( -  - )-=",
+        "//(  ~~  )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.//z",
+        "=-( -  - )-=",
+        "//(  ~~  )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.//Z",
+        "=-( -  - )-=",
+        "//(  ~~  )\\\\",
+        "  _/'--'\\_~ "
+      ],
+      [
+        "            ",
+        " \\\\.----.//Z",
+        "=-( -  - )-=",
+        "//(  ~~  )\\\\",
+        "  _/'--'\\_~ "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hi hi! {name} is here and smiling.",
+      "Gills fluffed, ready to go!",
+      "Hello! Let's make something cute."
+    ],
+    "toolFail": [
+      "Oops! Don't worry, I can grow a new try.",
+      "Hm, that one stung. We regenerate!",
+      "A little setback. We'll grow back stronger."
+    ],
+    "testPass": [
+      "Yay! My gills are doing a happy wiggle!",
+      "Green! Big smile!",
+      "All passing! You're amazing!"
+    ],
+    "testFail": [
+      "Aw, a red test. We'll grow a fix.",
+      "Let's look at the first failure together.",
+      "Hmm! Every bug is just a chance to regrow."
+    ],
+    "petted": [
+      "Eee! Thank you!",
+      "Gills go fluffy. That means happy.",
+      "Smiling extra wide."
+    ],
+    "thinking": [
+      "Hmm, bubbles thinking...",
+      "Let me splash this around.",
+      "Thinking with a smile."
+    ],
+    "rest": [
+      "Lying at the bottom of the tank. Relaxing.",
+      "Blub. Floaty break.",
+      "Just smiling at nothing."
+    ],
+    "working": [
+      "Cheering quietly!",
+      "I'll watch the bubbles while you work.",
+      "Go go go! Quietly."
+    ],
+    "wake": [
+      "Oh! Hi! I was dreaming about worms.",
+      "Awake and smiley!",
+      "Blub? Oh, we're back!"
+    ],
+    "farewell": [
+      "Bye bye! Keep smiling!",
+      "See you soon! Gills crossed.",
+      "Swim safe!"
+    ]
+  }
+}

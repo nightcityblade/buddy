@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { frameAt, framesFor, normalizeFrames, validateCharacter, type Character } from '../plugins/buddy/src/character.ts';
 import { raw } from './fixtures.ts';
@@ -78,5 +79,19 @@ describe('poses', () => {
   });
   test('normalizeFrames on an empty set is 1x1', () => {
     expect(normalizeFrames({})).toEqual({ poses: {}, width: 1, height: 1 });
+  });
+});
+
+describe('the shipped characters', () => {
+  const dir = new URL('../plugins/buddy/characters/', import.meta.url);
+  const files = readdirSync(dir).filter((f) => f.endsWith('.json')).sort();
+
+  test('the directory holds the six shipped characters', () => {
+    expect(files).toEqual(['cat.json', 'dragon.json', 'duck.json', 'ghost.json', 'professor.json', 'robot.json']);
+  });
+
+  test.each(files)('%s validates', (f) => {
+    const v = validateCharacter(JSON.parse(readFileSync(new URL(f, dir), 'utf8')), f.replace(/\.json$/, ''));
+    expect(v.ok || v.error).toBe(true);
   });
 });

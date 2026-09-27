@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "cactus",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        " n .---. n ",
+        " | |{E} {E}| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        " n .---. n ",
+        " | |{E} {E}| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        " n .-*-. n ",
+        " | |{E} {E}| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        " n .---. n ",
+        " | |{E} {E}| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        " n .---. n ",
+        " | |{E} {E}| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        " n .---. n ",
+        " | |- -| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        " n .---. n ",
+        " | |{E} {E}| | ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        " n |{E} {E}| n ",
+        " '-| u |-' ",
+        "  \\_____/  "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        " n .---. n!",
+        " | |{E} {E}| | ",
+        " '-| o |-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        "   .---.  !",
+        " n |{E} {E}| n ",
+        " '-| o |-' ",
+        "  \\_____/  "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        "*n .---. n*",
+        " | |{E} {E}| | ",
+        " '-|\\_/|-' ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        " n .-*-. n ",
+        " | |{E} {E}| | ",
+        " '-|\\_/|-' ",
+        "  \\_____/  "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "   .---.  z",
+        " ,-|- -|-, ",
+        " | | ~ | | ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        "   .---.  z",
+        " ,-|- -|-, ",
+        " | | ~ | | ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        "   .---.  Z",
+        " ,-|- -|-, ",
+        " | | ~ | | ",
+        "  \\_____/  "
+      ],
+      [
+        "           ",
+        "   .---.  Z",
+        " ,-|- -|-, ",
+        " | | ~ | | ",
+        "  \\_____/  "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hi! {name} is prickly outside, soft inside.",
+      "Sunshine and code. My favorite.",
+      "Hello! Need little, give lots."
+    ],
+    "toolFail": [
+      "Ouch, a prickly one. Let's handle it carefully.",
+      "Dry spell. We'll find water.",
+      "Hmm. Deserts have mirages. Check what's real."
+    ],
+    "testPass": [
+      "Green! Well, I was already green. Now we both are.",
+      "Blooming! All tests pass.",
+      "A flower for you. Tests are green."
+    ],
+    "testFail": [
+      "A red one. Don't worry, I'm tough.",
+      "A prickly failure. Grab it by the top line.",
+      "Let's water this bug with some attention."
+    ],
+    "petted": [
+      "Careful! ...Oh, you were careful. Thank you.",
+      "A gentle pat. No spines harmed.",
+      "Aww. I might bloom."
+    ],
+    "thinking": [
+      "Soaking up this idea like rain.",
+      "Hmm. Thinking in the sun.",
+      "Photosynthesizing a thought."
+    ],
+    "rest": [
+      "Basking. Cacti love basking.",
+      "Storing a little water.",
+      "Sunbathing in my pot."
+    ],
+    "working": [
+      "Standing tall while you work.",
+      "I'll stay right here. I'm good at that.",
+      "Quiet support, low maintenance."
+    ],
+    "wake": [
+      "Oh! Morning sun? No, just you. Also nice.",
+      "Awake! Spines ready.",
+      "Hm? Blooming back to life."
+    ],
+    "farewell": [
+      "Bye! Water me with good news.",
+      "See you! I'll be right here in the sun.",
+      "Stay sharp!"
+    ]
+  }
+}

@@ -7,9 +7,14 @@ export const QUESTION_MAX_TOKENS = 100;
 export const QUIP_MAX_TOKENS = 60;
 const REPLY_CAP = 240;
 
-/** The fork's one user message: persona, the question, the one-line rule. */
-export function forkPrompt(persona: string, question: string): string {
-  return `${persona}\n\nThe user asks you directly: ${question}. ${ONE_LINE_RULE}`;
+/** The rendered memory before what is asked, and leave to refer back to it; '' without one. */
+function recalled(memory: string): string {
+  return memory ? `${memory}\nThat is what you and the user said to each other lately; you may refer back to it.\n\n` : '';
+}
+
+/** The fork's one user message: persona, the buddy's memory, the question, the one-line rule. */
+export function forkPrompt(persona: string, question: string, memory = ''): string {
+  return `${persona}\n\n${recalled(memory)}The user asks you directly: ${question}. ${ONE_LINE_RULE}`;
 }
 
 /** The system prompt of a completion: persona and the one-line rule. */
@@ -17,19 +22,20 @@ export function oneLineSystem(persona: string): string {
   return `${persona}\n\n${ONE_LINE_RULE}`;
 }
 
-export function questionPrompt(question: string): string {
-  return `The user asks you directly: ${question}`;
+/** A completion's question, after the buddy's memory. */
+export function questionPrompt(question: string, memory = ''): string {
+  return `${recalled(memory)}The user asks you directly: ${question}`;
 }
 
 export type TurnSummary = { tools: string[]; failures: number; lastBash: string };
 
-/** What a quip reacts to: the tools the turn used, its failures, its last shell command. */
-export function quipPrompt(t: TurnSummary): string {
+/** What a quip reacts to: the buddy's memory, then the tools the turn used, its failures, its last shell command. */
+export function quipPrompt(t: TurnSummary, memory = ''): string {
   const counts = new Map<string, number>();
   for (const tool of t.tools) counts.set(tool, (counts.get(tool) ?? 0) + 1);
   const tools = [...counts].map(([name, n]) => (n > 1 ? `${name} x${n}` : name)).join(', ');
   const bash = t.lastBash ? t.lastBash.slice(0, 120) : 'none';
-  return `The turn just ended. Tools used: ${tools}. Failures: ${t.failures}. Last shell command: ${bash}. React to it.`;
+  return `${recalled(memory)}The turn just ended. Tools used: ${tools}. Failures: ${t.failures}. Last shell command: ${bash}. React to it.`;
 }
 
 /** A reply as one bubble line: the first non-empty line, unquoted, capped. */

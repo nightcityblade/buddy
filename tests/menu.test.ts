@@ -1,0 +1,85 @@
+import { describe, expect, test } from 'vitest';
+import { validateCharacter, type Character } from '../plugins/buddy/src/character.ts';
+import {
+  allItems, buildMenu, currentKeyOf, findItem, menuRows, moveKey, previewOf, rowLabel, type MenuInput, type Originals,
+} from '../plugins/buddy/src/menu.ts';
+import { loadEntries, mergeRoster } from '../plugins/buddy/src/roster.ts';
+
+// Invented characters and an invented companion: never a real ~/.claude.json.
+
+function char(id: string, name: string, extra: Record<string, unknown> = {}): string {
+  return JSON.stringify({ id, name, description: `${name}.`, persona: `You are ${name},\n  a test.`, poses: { idle: [[`(${id})`], [`[${id}]`]] }, lines: { greeting: [`${name} waves.`] }, motion: { walk: false }, ...extra });
+}
+
+const builtins = loadEntries([{ name: 'cat.json', text: char('cat', 'Cat') }, { name: 'duck.json', text: char('duck', 'Duck') }, { name: 'bad.json', text: '{' }], 'builtin');
+const users = loadEntries([{ name: 'mine.json', text: char('mine', 'Mine') }], 'user');
+const roster = mergeRoster(builtins, users);
+const v = validateCharacter(JSON.parse(char('original', 'Mochi', { lines: {} })));
+if (!v.ok) throw new Error(v.error);
+const mochi: Character = { ...v.character, card: { subtitle: 'blob · ★★★ rare', rows: ['SNARK     ████████░░ 81', 'hatched 2026-04-01'] } };
+const found: Originals = { kind: 'found', soul: { name: 'Mochi', personality: 'Round.' }, notes: [], rolls: [{ variant: 'native', character: mochi }, { variant: 'npm', error: 'species/hats.json has no crown' }] };
+const input = (o: Partial<MenuInput> = {}): MenuInput => ({ roster, folder: { isSet: true }, originals: found, ...o });
+
+describe('buildMenu', () => {
+  test('three titled groups: shipped, yours (both rolls), your folder', () => {
+    const m = buildMenu(input());
+    expect(m.sections.map((s) => s.title)).toEqual(['Shipped', 'Yours', 'Your folder']);
+    expect(m.sections[0]!.items.map((i) => i.label)).toEqual(['bad (invalid)', 'Cat (cat)', 'Duck (duck)']);
+    expect(m.sections[1]!.items.map((i) => [i.key, i.label])).toEqual([['original:native', 'Mochi — native install'], ['original:npm', 'Mochi — npm install']]);
+    expect(m.sections[1]!.items[1]!.error).toBe('species/hats.json has no crown');
+    expect(m.sections[2]!.items.map((i) => i.key)).toEqual(['use:mine']);
+    expect(m.sections.flatMap((s) => s.lines)).toEqual([]);
+  });
+
+  test('a failure to look is a line in its group, never an empty group', () => {
+    const m = buildMenu(input({ originals: { kind: 'error', error: "couldn't read ~/.claude.json: EACCES" }, shippedError: "couldn't read /x/characters: gone", folder: { isSet: true, error: "couldn't read ~/chars: gone" } }));
+    expect(m.sections.map((s) => s.lines)).toEqual([["couldn't read /x/characters: gone"], ["couldn't read ~/.claude.json: EACCES"], ["couldn't read ~/chars: gone"]]);
+    expect(m.sections[1]!.items).toEqual([]);
+  });
+
+  test('nothing there says so in one line; a backup is named', () => {
+    const none = buildMenu(input({ originals: { kind: 'none', notes: [] }, folder: { isSet: false }, roster: mergeRoster([], []) }));
+    expect(none.sections.map((s) => s.lines)).toEqual([['No shipped characters found.'], ['No companion in ~/.claude.json or its backups.'], ['No folder set: the characterDir option names one.']]);
+    const backup = buildMenu(input({ originals: { ...found, from: '~/.claude.json.backup' } as Originals }));
+    expect(backup.sections[1]!.lines).toEqual(['From the backup ~/.claude.json.backup.']);
+  });
+});
+
+describe('moving and marking', () => {
+  const m = buildMenu(input());
+  test('down and up walk every row in order, kept inside the list', () => {
+    expect(allItems(m).map((i) => i.key)).toEqual(['use:bad', 'use:cat', 'use:duck', 'original:native', 'original:npm', 'use:mine']);
+    expect(moveKey(m, 'use:duck', 1)).toBe('original:native');
+    expect(moveKey(m, 'use:mine', 1)).toBe('use:mine');
+    expect(moveKey(m, 'use:bad', -1)).toBe('use:bad');
+    expect(moveKey(buildMenu(input({ roster: mergeRoster([], []), originals: { kind: 'none', notes: [] } })), 'x', 1)).toBeUndefined();
+  });
+  test('the current row: the original by its roll, any other by id, marked with *', () => {
+    expect(currentKeyOf('original', 'npm')).toBe('original:npm');
+    expect(currentKeyOf('cat', undefined)).toBe('use:cat');
+    expect(rowLabel(findItem(m, 'use:cat')!, 'use:cat')).toBe('* Cat (cat)');
+    expect(rowLabel(findItem(m, 'use:duck')!, 'use:cat')).toBe('  Duck (duck)');
+    expect(menuRows(m)).toBeGreaterThanOrEqual(14);
+  });
+});
+
+describe('previewOf', () => {
+  const m = buildMenu(input());
+  test('the idle frames turn; name, description (never the persona prompt), greeting', () => {
+    const p0 = previewOf(findItem(m, 'use:cat'), 0, 0);
+    const p1 = previewOf(findItem(m, 'use:cat'), 1, 0);
+    expect(p0).toMatchObject({ kind: 'character', rows: ['(cat)'], name: 'Cat', about: 'Cat.', sample: 'Cat waves.', card: [] });
+    expect(JSON.stringify(p0)).not.toContain('You are Cat');
+    expect(p1).toMatchObject({ rows: ['[cat]'] });
+  });
+  test('an original shows its card; no greeting of its own falls back to the generic one', () => {
+    const p = previewOf(findItem(m, 'original:native'), 0, 0);
+    expect(p).toMatchObject({ name: 'Mochi', about: 'Round.', card: ['blob · ★★★ rare', 'SNARK     ████████░░ 81', 'hatched 2026-04-01'], sample: 'Hello there.' });
+    expect(JSON.stringify(p)).not.toContain('You are Mochi');
+  });
+  test('an entry that will not draw says why', () => {
+    expect(previewOf(findItem(m, 'use:bad'), 0, 0)).toMatchObject({ kind: 'error', label: 'bad (invalid)' });
+    expect(previewOf(findItem(m, 'original:npm'), 0, 0)).toEqual({ kind: 'error', label: 'Mochi — npm install', error: 'species/hats.json has no crown' });
+    expect(previewOf(undefined, 0, 0)).toMatchObject({ kind: 'error' });
+  });
+});

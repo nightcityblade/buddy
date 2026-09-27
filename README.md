@@ -2,10 +2,10 @@
 
 # buddy
 
-**A tiny companion that walks on your Claude Code prompt line and talks back: the Professor by default, five more characters built in, or your own.**
+**A tiny companion that walks on your Claude Code prompt line and talks back: Quack the duck by default, five more characters built in, or your own.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![CI](https://github.com/rezzminator/buddy/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/rezzminator/buddy/actions/workflows/ci.yml)
 [![Built with Professor](https://img.shields.io/badge/built%20with-Professor-8A2BE2)](https://github.com/rezzminator/professor)
@@ -33,7 +33,7 @@ happens, and answers you through Claude Code's own model calls: there is no
 buddy server to go quiet.
 
 - 🚶 **Lives on your prompt line.** It walks back and forth above the prompt,
-  stops now and then to rest (the Professor sips his tea), stands
+  stops now and then to rest (Quack shakes out its feathers), stands
   still while Claude works, and falls asleep after midnight.
 - 🎉 **Reacts to the work.** A failed or denied tool call gets an "oops"; a
   test run passing in a Bash command gets a cheer and a burst of confetti; a
@@ -41,13 +41,17 @@ buddy server to go quiet.
 - 💬 **Talks back.** `/buddy why is this slow?` gets a one-line answer, in
   character. By default the question forks this chat: the same model, the
   whole conversation in view, served from its prompt cache.
-- 🎭 **Six characters, and yours.** Pick one with `/buddy use`, or draw your
-  own: a JSON file with a persona and a few poses of ASCII art.
+- 🐣 **Your own buddy, back.** `/buddy-personality` opens a menu with a
+  live preview; its "Yours" group recomputes the companion Claude Code
+  hatched for your account (species, rarity, eyes, hat, stats) with the name
+  and personality it saved.
+- 🎭 **Six characters, and yours.** Pick one in `/buddy-personality`, or draw
+  your own: a JSON file with a persona and a few poses of ASCII art.
 - 🤫 **Free unless you ask.** Walking, petting, switching and reactions never
   call a model. Only a question you ask, and quips if you turn them on,
   spend tokens.
 - 🛡️ **Never in the way.** A character that fails to load is replaced by the
-  Professor, who says why; a hook that fails logs the error and steps aside.
+  duck, who says why; a hook that fails logs the error and steps aside.
   `/buddy off` hides it, and it stays hidden across restarts.
 
 ## 🚀 Quick start
@@ -62,8 +66,8 @@ claude plugin install buddy@buddy
 ```
 
 `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` also works in the `env` block of
-`settings.json`. Start a new session and the Professor walks in above your
-prompt; type `/buddy` to pet him.
+`settings.json`. Start a new session and Quack walks in above your
+prompt; type `/buddy` to pet it.
 
 > **Early access.** buddy is built on Claude Code's function hooks, an
 > early-access surface that may change between releases. A plugin built on
@@ -79,31 +83,59 @@ prompt; type `/buddy` to pet him.
 
 | Command | What it does |
 | --- | --- |
-| `/buddy` | Pet it: a happy pose, a line, and the count so far (`Professor: 3 pets`). |
-| `/buddy list` | Every character: `*` marks the current one, `(yours)` one from your `characterDir`, `INVALID: {error}` one that failed to load. |
-| `/buddy use {id}` | Switch now, and remember it. An unknown id lists the valid ones. |
-| `/buddy use default` | Forget the `/buddy use` choice and go back to the `character` option. |
+| `/buddy` | Pet it: a happy pose, a line, and the count so far (`Quack: 3 pets`). |
 | `/buddy off` / `/buddy on` | Hide or show it, remembered across restarts. |
 | `/buddy reload` | Rescan the characters, after you edit one. |
 | `/buddy help` | Usage. |
 | `/buddy {anything else}` | A question: it thinks, then answers in one line, in character (see `questionMode`). |
+| `/buddy-personality` | The one place to see every character and switch: a menu with a live preview, `*` on the current one, `(invalid)` on one that failed to load; Enter switches and remembers it, Esc closes (see [Pick a personality](#-pick-a-personality)). |
 
 ## 🎭 Characters
 
 | id | |
 | --- | --- |
-| `professor` | A warm, precise professor with a cup of tea. The default companion. |
-| `duck` | A listening duck: explain your bug out loud, get a quack back. |
+| `duck` | Quack, a sarcastic little duck with a sharp tongue and a mischievous streak, waddling through your code with smug confidence. The default companion. |
+| `professor` | A warm, precise professor with a cup of tea. |
 | `cat` | An aloof cat who supervises your terminal and pretends not to care. |
 | `robot` | A literal little robot on one wheel that reports exactly what happened. |
 | `ghost` | A gentle ghost that drifts along your prompt line, softly spooky. |
 | `dragon` | A very small dragon with very large pride, guarding your code. |
 
-The choice is, in order: your last `/buddy use`, then the `character`
-option, then `professor`. Your own characters sit beside these, and one with
+The choice is, in order: your last pick in `/buddy-personality`, then the
+`character` option, then `duck`. Your own characters sit beside these, and one with
 a built-in's id replaces it.
 
+## 🐣 Pick a personality
+
+`/buddy-personality` opens a menu in a pane above the prompt: the entries on
+the left, a live preview of the highlighted one on the right.
+
+- **Shipped**: the characters that come with the plugin.
+- **Yours**: the companion Claude Code's own `/buddy` hatched for your
+  account, when `~/.claude.json` still holds its name and personality, or a
+  backup of it does (`~/.claude.json.*`, `~/.claude/backups/`). It is listed
+  twice, as the native install and as the npm install rolled it: the two
+  turned your account id into a different species, eyes, hat and stats, and
+  the preview lets you recognise yours.
+- **Your folder**: your own characters, from the `characterDir` option.
+
+↑ and ↓ move the highlight, and the preview follows: the sprite in its idle
+animation, the name, its description (for your original, its saved personality) and a greeting in its voice;
+for your original companion also its rarity stars, shiny, the five stats as
+bars (`SNARK     ████████░░ 81`) and the day it hatched. `*` marks the one
+drawn now. Enter switches to the highlighted one and remembers it: it is still there
+after `/reload` and a restart. Esc
+closes the menu and changes nothing.
+
+The menu only reads `~/.claude.json`; it never writes it. A file it cannot
+read shows as one line in the "Yours" group, saying why. Your account id is
+never shown, saved or logged. To go back to your usual character, pick it
+in the menu: the `character` option's one is listed under Shipped, or under
+Your folder when it is your own.
+
 ## 🧠 How it works
+
+The full design, decision by decision, lives in [docs/design](docs/design/_index.md).
 
 - **Walking.** The character steps one column every `stepMs` (200 ms unless
   the character says otherwise), turns at the edge, and rests now and then.
@@ -139,8 +171,10 @@ a built-in's id replaces it.
   `quipModel` writes a one-line reaction to the turn: the tools it used,
   how many failed, and the last Bash command.
 - **Errors are never silent.** A chosen character that is missing or invalid
-  draws the Professor with a bubble `Couldn't load {id}: {error}` for 10
-  seconds, and `/buddy list` names the error.
+  draws the duck with a bubble
+  `Couldn't load {id}: {error}; /buddy-personality picks another` for 10
+  seconds, and `/buddy-personality` marks it `(invalid)` with the error in
+  its preview.
 
 ## ⚙️ Configuration
 
@@ -150,13 +184,14 @@ ignores options under any other key.
 
 | Option | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `character` | string | `"professor"` | Character id (see /buddy list) |
+| `character` | string | `"duck"` | Character id (see /buddy-personality) |
 | `characterDir` | directory | `""` | Folder of your own character JSON files |
 | `motion` | boolean | `true` | Walk along the prompt line |
 | `questionMode` | string | `"fork"` | /buddy questions: fork (sees the chat, uses its cache), complete, or off |
 | `quips` | boolean | `false` | Model-written one-liners at the end of a turn (spends tokens) |
 | `quipModel` | string | `"haiku"` | Model for quips and fresh-session answers |
 | `quipCooldownSec` | number | `45` | Minimum seconds between quips |
+| `memory` | number | `6` | How many recent exchanges the buddy remembers (0 = off): a /buddy question with its answer, or one line it said on its own; kept per session and per character, they go into its next answer or quip; at most 30 |
 
 ```json
 {
@@ -178,9 +213,9 @@ Put yours in a folder, point `characterDir` at it, and `/buddy reload`.
 | Field | Type | Req | Meaning |
 | --- | --- | --- | --- |
 | `$schema` | string | no | `"../schema/character.schema.json"` in built-ins |
-| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; `/buddy use {id}` |
+| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; the id `/buddy-personality` stores |
 | `name` | string ≤ 40 | yes | display name |
-| `description` | string ≤ 100 | yes | one line for `/buddy list` |
+| `description` | string ≤ 100 | yes | one line for the menu's preview and the hover card |
 | `author` | string ≤ 60 | no | credit |
 | `persona` | string ≤ 1200 | yes | the character's voice prompt, 2nd person ("You are …") |
 | `color` | Ink color name or `#rrggbb` | no | sprite color, default `"yellow"` |
@@ -198,9 +233,11 @@ working example, how to test it, and how to send it in to ship with buddy.
 <summary><b>Is this the <code>/buddy</code> that Claude Code removed?</b></summary>
 
 No. buddy is an independent plugin, not a patch to Claude Code or a revival
-of the removed code. You choose the character instead of hatching one from
-your account, and its reactions come from its own lines and from your own
-model calls, not from a server.
+of the removed code. You choose a character, and its reactions come from its
+own lines and from your own model calls, not from a server. But the
+"Yours" group of `/buddy-personality` does bring back the companion the
+removed `/buddy` hatched for your account: the same species, rarity, eyes, hat and stats, recomputed
+from your account id, with the name and personality `~/.claude.json` kept.
 </details>
 
 <details>
@@ -230,10 +267,10 @@ nothing happening. Anything that happens wakes it.
 </details>
 
 <details>
-<summary><b>My character shows as INVALID.</b></summary>
+<summary><b>My character shows as invalid.</b></summary>
 
-`/buddy list` prints the first error in the file. Fix it, save, and run
-`/buddy reload`.
+`/buddy-personality` lists it as `{id} (invalid)`, and its preview names the
+first error in the file. Fix it, save, and run `/buddy reload`.
 </details>
 
 ## 🛠️ Development
@@ -256,7 +293,7 @@ where every decision is a pure, unit-tested module.
 
 ## 🎓 Built with Professor
 
-buddy is built and maintained with [Professor](https://github.com/rezzminator/professor), a fleet controller and discipline layer for Claude Code, Codex and OpenCode: chats that message each other, agents held to the project's rules, and gated releases. The default character is its namesake.
+buddy is built and maintained with [Professor](https://github.com/rezzminator/professor), a fleet controller and discipline layer for Claude Code, Codex and OpenCode: chats that message each other, agents held to the project's rules, and gated releases. The Professor character, shipped alongside Quack, carries its namesake.
 
 ## License
 

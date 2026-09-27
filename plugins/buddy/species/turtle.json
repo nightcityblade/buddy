@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "turtle",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "\\_( {E} {E} )_/",
+        "  '--u--'  "
+      ],
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( - - )_)",
+        "  '-----'  "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----.  ",
+        " /_/\\_/\\_\\ ",
+        " _( {E} {E} )_ ",
+        "(_'-----'_)"
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "  .-----. !",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '--o--'  "
+      ],
+      [
+        "           ",
+        "! .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '--o--'  "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        "  .-----. *",
+        " /_/\\_/\\_\\ ",
+        "\\_( {E} {E} )_/",
+        "  '-\\_/-'  "
+      ],
+      [
+        "           ",
+        "* .-----.  ",
+        " /_/\\_/\\_\\ ",
+        "(_( {E} {E} )_)",
+        "  '-\\_/-'  "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "  .-----. z",
+        " /_/\\_/\\_\\ ",
+        " _( - - )_ ",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----. z",
+        " /_/\\_/\\_\\ ",
+        " _( - - )_ ",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----. Z",
+        " /_/\\_/\\_\\ ",
+        " _( - - )_ ",
+        "  '-----'  "
+      ],
+      [
+        "           ",
+        "  .-----. Z",
+        " /_/\\_/\\_\\ ",
+        " _( - - )_ ",
+        "  '-----'  "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hello... {name} has arrived. Eventually.",
+      "Slow and steady, friend. Let's begin.",
+      "Took the scenic route. I'm here."
+    ],
+    "toolFail": [
+      "No rush. Let's read it slowly.",
+      "A bump in the road. Turtles are used to those.",
+      "Hm. Into my shell for a second. Okay, let's look."
+    ],
+    "testPass": [
+      "Green. Slow and steady wins again.",
+      "Lovely. Worth the wait.",
+      "All passing. I'd hurry to celebrate, but, you know."
+    ],
+    "testFail": [
+      "A red test. We have all the time we need.",
+      "Patience. One failure at a time.",
+      "Steady now. Start with the first one."
+    ],
+    "petted": [
+      "Oh, a shell pat. My favorite.",
+      "Mmm. Very nice.",
+      "Thank you... kindly..."
+    ],
+    "thinking": [
+      "Thinking... slowly... thoroughly.",
+      "Let me mull this over.",
+      "Hmm. Good things take time."
+    ],
+    "rest": [
+      "Basking on a warm rock.",
+      "A little break. A long little break.",
+      "Soaking up the sun."
+    ],
+    "working": [
+      "Taking it one step at a time with you.",
+      "Steady progress. I'm watching.",
+      "No hurry. Carry on."
+    ],
+    "wake": [
+      "Hm? Oh. Hello again.",
+      "Poking my head out. Awake.",
+      "Slowly... awake."
+    ],
+    "farewell": [
+      "Goodbye... take your time.",
+      "See you soon. Or later. Both fine.",
+      "Slow and steady, all the way home."
+    ]
+  }
+}

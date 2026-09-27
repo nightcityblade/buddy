@@ -15,9 +15,9 @@ makes the file invalid.
 | Field | Type | Req | Meaning |
 | --- | --- | --- | --- |
 | `$schema` | string | no | `"../schema/character.schema.json"` in built-ins |
-| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; `/buddy use {id}` |
+| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; the id `/buddy-personality` stores |
 | `name` | string ≤ 40 | yes | display name |
-| `description` | string ≤ 100 | yes | one line for `/buddy list` |
+| `description` | string ≤ 100 | yes | one line for the menu's preview and the hover card |
 | `author` | string ≤ 60 | no | credit |
 | `persona` | string ≤ 1200 | yes | the character's voice prompt, 2nd person ("You are …") |
 | `color` | Ink color name or `#rrggbb` | no | sprite color, default `"yellow"` |
@@ -39,7 +39,7 @@ with a single frame is static. A pose you leave out falls back to another:
 | `idle` | yes, ≥ 1 frame | | standing still |
 | `walkRight` | when `motion.walk` is true (the default), ≥ 2 frames | | walking right: the leg cycle |
 | `walkLeft` | no | `walkRight` | walking left |
-| `rest` | no | `idle` | a pause in the walk (the Professor sips his tea) |
+| `rest` | no | `idle` | a pause in the walk (Quack shakes out its feathers) |
 | `oops` | no | `idle` | a tool call failed, or a test run failed |
 | `yay` | no | `idle` | a test run passed |
 | `thinking` | no | `idle` | a question is being answered |
@@ -67,7 +67,7 @@ voice.
 
 | Event | Said when |
 | --- | --- |
-| `greeting` | the session starts, or after `/buddy use {id}`, `/buddy use default`, `/buddy reload` and `/buddy on` |
+| `greeting` | the session starts, or after Enter in `/buddy-personality`, `/buddy reload` and `/buddy on` |
 | `toolFail` | a tool call failed or was denied |
 | `testPass` | a Bash command's output reads like a test pass |
 | `testFail` | a Bash command's output reads like a test failure |
@@ -132,12 +132,12 @@ Every pose it leaves out falls back as the table above says: `oops`,
 2. Point the `characterDir` option at that folder: through `/config`, or in
    `settings.json` under `pluginConfigs["buddy@buddy"].options.characterDir`.
    Start a new session.
-3. `/buddy list` shows `blob (yours)`, or `INVALID: {error}` with the first
-   thing wrong in the file.
-4. `/buddy use blob` draws it.
+3. `/buddy-personality` lists it under Your folder, or as `blob (invalid)`
+   with the first thing wrong in the file in its preview.
+4. Enter on it draws it.
 5. Edit the file, save, and run `/buddy reload` to see the change. Try a
    narrow window as well as a wide one.
-6. `/buddy use default` goes back to your usual character.
+6. Pick your usual character in `/buddy-personality` to go back to it.
 
 An editor that reads `$schema` checks the file as you type. Inside this
 repository, the built-ins use the relative path
@@ -159,7 +159,7 @@ repository, the built-ins use the relative path
    ```
 
 4. Try it in a real session: `claude --plugin-dir plugins/buddy`, then
-   `/buddy use {id}`.
+   pick it in `/buddy-personality`.
 5. Open a pull request against `develop`, with each pose pasted in a text
    block.
 
@@ -170,6 +170,75 @@ A character ships when:
 - its lines and persona are friendly: it is a companion, not a critic;
 - it is new: not a recolour or a near copy of one already built in;
 - you agree to license it under the repository's MIT license.
+
+## Species templates
+
+The "Yours" group of `/buddy-personality` brings back the companion that
+Claude Code's old `/buddy` hatched for you. Your account decides its species, eye, hat and rarity; its
+look comes from a species template, `plugins/buddy/species/{species}.json`,
+and its hat from `plugins/buddy/species/hats.json`. A template is ASCII art
+with blanks that the engine fills in: the eyes, the hat and the color.
+
+The 18 species are fixed, because the hatching algorithm picks from them:
+`duck`, `goose`, `blob`, `cat`, `dragon`, `octopus`, `owl`, `penguin`,
+`turtle`, `snail`, `ghost`, `axolotl`, `capybara`, `cactus`, `robot`,
+`rabbit`, `mushroom`, `chonk`. A contribution improves one of them.
+
+```json
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "blob",
+  "width": 9,
+  "hatCol": 4,
+  "poses": { "idle": [], "walkRight": [], "oops": [], "yay": [], "sleep": [] },
+  "lines": { "greeting": [] }
+}
+```
+
+The rules:
+
+- `species` equals the file name.
+- A frame is an array of rows. Row 0 of every frame is the hat row: all
+  spaces, because the engine draws the hat there. Then come 1 to 4 body rows.
+- `width` is at most 12. Every row of every frame is exactly `width` columns
+  wide, padded with spaces. Unlike a character, a template is not padded for
+  you, and a shorter row is invalid.
+- `{E}` marks an eye. The engine swaps in the companion's eye glyph, which is
+  one column wide, so `{E}` counts as one column. Everything else is printable
+  ASCII.
+- `hatCol` is the column the hat is centered on, over the head. A hat can be
+  up to 7 columns wide, so keep `hatCol` at least 3 columns from either edge.
+- `idle`, `walkRight`, `oops`, `yay` and `sleep` are required. `walkLeft`,
+  `working` and `rest` are optional.
+  - `idle` has at least 3 frames. Frame 0 is the base, a fidget comes
+    somewhere in between, and the last frame is the blink: the base with
+    every `{E}` replaced by `-`. Repeat the base frame to slow the rhythm.
+  - `walkRight` has at least 2 frames, and legs or body visibly move between
+    them.
+  - `sleep` draws its eyes as `-`. A `z` is welcome.
+- A creature drawn side-on needs its own `walkLeft`: the mirror image of
+  `walkRight`, with the head turned the other way. Keep its head on the
+  middle column, so that the mirrored head stays under the same `hatCol`.
+- `lines` has a pool for every event in the Lines table above, each with 2 to
+  4 lines of at most 120 characters, in the species' own voice. `{name}`
+  becomes the companion's name.
+- `hats.json` maps `crown`, `tophat`, `propeller`, `halo`, `wizard`, `beanie`
+  and `tinyduck` to one row of at most 7 columns each. `none` draws no row.
+
+### Preview a template
+
+From the repository root, this command prints the first frame of every pose,
+with `o` for the eyes and bars at the edges so that the padding shows:
+
+```sh
+node -e 'const t=require("./plugins/buddy/species/blob.json");for(const [p,fs] of Object.entries(t.poses))console.log(p+"\n"+fs[0].map(r=>"|"+r.replaceAll("{E}","o")+"|").join("\n"))'
+```
+
+The engine checks a template with `validateSpecies` in
+`plugins/buddy/src/species.ts`, which reports the first thing wrong by its
+path. `/buddy-personality` previews your own companion live. A template ships under
+the same rules as a character: the art and the lines are your own work, and
+they are friendly.
 
 ## Code
 

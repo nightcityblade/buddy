@@ -32,12 +32,21 @@ export type SceneInput = {
   sleeping: boolean;
   zTick: number;
   stats: { pets: number; questions: number };
+  /** The brain's clock in ms: a shiny sprite's color cycles with it. */
+  now?: number;
 };
 
 export const MIN_BUBBLE_COLS = 40;
 export const MAX_BUBBLE_WIDTH = 60;
 export const MIN_EFFECT_COLS = 40;
 const CARD_MAX_WIDTH = 44;
+export const RAINBOW = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta'] as const;
+export const SHINY_STEP_MS = 200;
+
+/** The sprite's color: its own, or for a shiny one the rainbow, a step per tick. */
+export function spriteColor(c: Character, now: number): string {
+  return c.shiny ? RAINBOW[Math.floor(now / SHINY_STEP_MS) % RAINBOW.length]! : c.color;
+}
 
 export const MOODS: Record<Pose, string> = {
   idle: 'curious',
@@ -103,7 +112,7 @@ export function buildScene(i: SceneInput): Scene | null {
     effects.push(toSegs([{ col, text, color: 'gray' }]));
   }
 
-  const lines = [c.name, c.description, `pets ${i.stats.pets} | questions ${i.stats.questions} | ${MOODS[i.pose]}`];
+  const lines = [c.name, c.card?.subtitle ?? c.description, `pets ${i.stats.pets} | questions ${i.stats.questions} | ${MOODS[i.pose]}`, ...(c.card?.rows ?? [])];
   const cw = Math.min(CARD_MAX_WIDTH, Math.max(...lines.map((l) => l.length)) + 4);
   const fitsRight = x + c.width + 1 + cw <= i.cols;
   const fitsLeft = x - cw - 1 >= 0;
@@ -111,5 +120,5 @@ export function buildScene(i: SceneInput): Scene | null {
   const left = preferLeft ? (fitsLeft ? -(cw + 1) : fitsRight ? c.width + 1 : null) : fitsRight ? c.width + 1 : fitsLeft ? -(cw + 1) : null;
   const card = left === null ? null : { lines, left, width: cw };
 
-  return { color: c.color, rows: [...frameAt(c, i.pose, i.frame)], x, rowX, bubble, effects, card };
+  return { color: spriteColor(c, i.now ?? 0), rows: [...frameAt(c, i.pose, i.frame)], x, rowX, bubble, effects, card };
 }

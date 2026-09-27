@@ -4,6 +4,19 @@ Every release of buddy. Versions follow [semantic versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-09-27
+
+### Added
+- `/buddy-personality`: a menu in a focused pane. The entries sit on the left in three titled groups, Shipped, Yours and Your folder, with `*` on the one drawn now; the right shows a live preview of the highlighted one: its sprite in its idle animation, its name, its description (for an original, its personality) and its greeting. ↑/↓ move the highlight and the preview follows; Enter switches to it and remembers it, across `/reload` and restarts; Esc closes the menu and changes nothing.
+- Yours: the companion Claude Code's own `/buddy` hatched for your account before version 2.1.97 removed it. The menu reads `~/.claude.json` (never writes it), or the newest `~/.claude.json` backup that holds a companion, and lists it twice, as the native and the npm install rolled it: the same species, rarity, eyes, hat, shiny and stats, drawn with buddy's own art for all 18 species. A file that cannot be read or parsed is said in one line in the group, never shown as an empty one.
+- An original companion wears its rarity's color; a shiny one cycles through the rainbow with a sparkle. Its preview and hover card show the stars, five stat bars and the day it hatched. Once picked, its name, personality and roll are saved, so a restart draws it without looking through backups; the menu marks it with `*` when it is drawn. The account id is never saved or logged.
+- `schema/species.schema.json`, the contract of a species template and its hat art.
+- A short memory: the last `memory` exchanges (option, default 6, 0 = off, at most 30), each a `/buddy` question with its answer or a line its bubble showed on its own (a canned line or a quip, never the thinking filler), kept per session and per character across `/reload`, go before the question in its next answer or quip, so it can refer back to them; no extra model call.
+
+### Changed
+- `/buddy list` and `/buddy use {id}` (with `/buddy use default`) are folded into `/buddy-personality`, now the one way to see the characters and switch; to go back to the `character` option's character, pick it there. A character that fails to load says `/buddy-personality picks another`.
+- The default character, and the fallback when a chosen one fails to load, is now the duck, Quack; the Professor stays a shipped character, no longer the default.
+
 ## [0.1.0] — 2026-09-27
 
 ### Added
