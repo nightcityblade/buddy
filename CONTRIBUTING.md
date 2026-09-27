@@ -171,6 +171,75 @@ A character ships when:
 - it is new: not a recolour or a near copy of one already built in;
 - you agree to license it under the repository's MIT license.
 
+## Species templates
+
+`/buddy adopt` brings back the companion that Claude Code's old `/buddy`
+hatched for you. Your account decides its species, eye, hat and rarity; its
+look comes from a species template, `plugins/buddy/species/{species}.json`,
+and its hat from `plugins/buddy/species/hats.json`. A template is ASCII art
+with blanks that the engine fills in: the eyes, the hat and the color.
+
+The 18 species are fixed, because the hatching algorithm picks from them:
+`duck`, `goose`, `blob`, `cat`, `dragon`, `octopus`, `owl`, `penguin`,
+`turtle`, `snail`, `ghost`, `axolotl`, `capybara`, `cactus`, `robot`,
+`rabbit`, `mushroom`, `chonk`. A contribution improves one of them.
+
+```json
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "blob",
+  "width": 9,
+  "hatCol": 4,
+  "poses": { "idle": [], "walkRight": [], "oops": [], "yay": [], "sleep": [] },
+  "lines": { "greeting": [] }
+}
+```
+
+The rules:
+
+- `species` equals the file name.
+- A frame is an array of rows. Row 0 of every frame is the hat row: all
+  spaces, because the engine draws the hat there. Then come 1 to 4 body rows.
+- `width` is at most 12. Every row of every frame is exactly `width` columns
+  wide, padded with spaces. Unlike a character, a template is not padded for
+  you, and a shorter row is invalid.
+- `{E}` marks an eye. The engine swaps in the companion's eye glyph, which is
+  one column wide, so `{E}` counts as one column. Everything else is printable
+  ASCII.
+- `hatCol` is the column the hat is centered on, over the head. A hat can be
+  up to 7 columns wide, so keep `hatCol` at least 3 columns from either edge.
+- `idle`, `walkRight`, `oops`, `yay` and `sleep` are required. `walkLeft`,
+  `working` and `rest` are optional.
+  - `idle` has at least 3 frames. Frame 0 is the base, a fidget comes
+    somewhere in between, and the last frame is the blink: the base with
+    every `{E}` replaced by `-`. Repeat the base frame to slow the rhythm.
+  - `walkRight` has at least 2 frames, and legs or body visibly move between
+    them.
+  - `sleep` draws its eyes as `-`. A `z` is welcome.
+- A creature drawn side-on needs its own `walkLeft`: the mirror image of
+  `walkRight`, with the head turned the other way. Keep its head on the
+  middle column, so that the mirrored head stays under the same `hatCol`.
+- `lines` has a pool for every event in the Lines table above, each with 2 to
+  4 lines of at most 120 characters, in the species' own voice. `{name}`
+  becomes the companion's name.
+- `hats.json` maps `crown`, `tophat`, `propeller`, `halo`, `wizard`, `beanie`
+  and `tinyduck` to one row of at most 7 columns each. `none` draws no row.
+
+### Preview a template
+
+From the repository root, this command prints the first frame of every pose,
+with `o` for the eyes and bars at the edges so that the padding shows:
+
+```sh
+node -e 'const t=require("./plugins/buddy/species/blob.json");for(const [p,fs] of Object.entries(t.poses))console.log(p+"\n"+fs[0].map(r=>"|"+r.replaceAll("{E}","o")+"|").join("\n"))'
+```
+
+The engine checks a template with `validateSpecies` in
+`plugins/buddy/src/species.ts`, which reports the first thing wrong by its
+path. `/buddy adopt` draws your own companion live. A template ships under
+the same rules as a character: the art and the lines are your own work, and
+they are friendly.
+
 ## Code
 
 A change to the engine lands in `plugins/buddy/src/` as a pure function with

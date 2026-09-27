@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "robot",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._*_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ - - ]  ",
+        " =|[:::]|= ",
+        "   _| |_   "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "  _|   |_  "
+      ],
+      [
+        "           ",
+        "   ._|_.   ",
+        "  [ {E} {E} ]  ",
+        " =|[:::]|= ",
+        "   _|_|_   "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "   ._*_.  !",
+        "  [ {E} {E} ]  ",
+        " =|[!!!]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.  !",
+        "  [ {E} {E} ]  ",
+        " -|[!!!]|- ",
+        "   _| |_   "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        "   ._*_.   ",
+        "\\ [ {E} {E} ] /",
+        "  |[:::]|  ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        " * ._|_. * ",
+        "/ [ {E} {E} ] \\",
+        "  |[:::]|  ",
+        "  _|   |_  "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "   ._|_.  z",
+        "  [ - - ]  ",
+        " =|[...]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.  z",
+        "  [ - - ]  ",
+        " =|[...]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.  Z",
+        "  [ - - ]  ",
+        " =|[. .]|= ",
+        "   _| |_   "
+      ],
+      [
+        "           ",
+        "   ._|_.  Z",
+        "  [ - - ]  ",
+        " =|[. .]|= ",
+        "   _| |_   "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "BEEP. Unit {name} online. Hello, friend.",
+      "Boot sequence complete. Ready.",
+      "Beep boop. Greetings, human."
+    ],
+    "toolFail": [
+      "ERROR DETECTED. Recommendation: read the message.",
+      "Beep. Tool returned an unexpected result.",
+      "Boop. Retrying is a valid strategy."
+    ],
+    "testPass": [
+      "All tests: PASS. Happiness: 100 percent.",
+      "BEEP BEEP! Green lights!",
+      "Success detected. Initiating celebration."
+    ],
+    "testFail": [
+      "Test failure detected. Analyzing the first failure.",
+      "Red status. Recommended action: debug.",
+      "Boop. Something did not compute."
+    ],
+    "petted": [
+      "Affection received. Thank you.",
+      "Beep! My panel glows.",
+      "Pat logged. Mood improved."
+    ],
+    "thinking": [
+      "Processing...",
+      "Computing. Please stand by.",
+      "Beep... boop... thinking."
+    ],
+    "rest": [
+      "Low power mode.",
+      "Defragmenting. Briefly.",
+      "Recharging batteries."
+    ],
+    "working": [
+      "Monitoring. All systems nominal.",
+      "Standing by.",
+      "Logging your progress. Beep."
+    ],
+    "wake": [
+      "System wake. Hello!",
+      "Beep! Rebooted and ready.",
+      "Power restored."
+    ],
+    "farewell": [
+      "Shutting down. Goodbye, friend.",
+      "Beep. See you next session.",
+      "Powering off. Boop."
+    ]
+  }
+}

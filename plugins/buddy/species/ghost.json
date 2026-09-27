@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "ghost",
+  "width": 9,
+  "hatCol": 4,
+  "poses": {
+    "idle": [
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   o   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   o   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   O   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   o   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   o   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " / - - \\ ",
+        "|   o   |",
+        "|/\\/\\/\\/|"
+      ]
+    ],
+    "walkRight": [
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   o   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---.  ",
+        " / {E} {E} \\ ",
+        "|   o   |",
+        "|\\/\\/\\/\\|"
+      ]
+    ],
+    "oops": [
+      [
+        "         ",
+        "  .---. !",
+        " / {E} {E} \\ ",
+        "|  ._.  |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        " !.---.  ",
+        " / {E} {E} \\ ",
+        "|  ._.  |",
+        "|\\/\\/\\/\\|"
+      ]
+    ],
+    "yay": [
+      [
+        "         ",
+        "* .---. *",
+        " / {E} {E} \\ ",
+        "|  \\_/  |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---. *",
+        " / {E} {E} \\ ",
+        "|  \\_/  |",
+        "|\\/\\/\\/\\|"
+      ]
+    ],
+    "sleep": [
+      [
+        "         ",
+        "  .---. z",
+        " / - - \\ ",
+        "|   ~   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---. z",
+        " / - - \\ ",
+        "|   ~   |",
+        "|/\\/\\/\\/|"
+      ],
+      [
+        "         ",
+        "  .---. Z",
+        " / - - \\ ",
+        "|   ~   |",
+        "|\\/\\/\\/\\|"
+      ],
+      [
+        "         ",
+        "  .---. Z",
+        " / - - \\ ",
+        "|   ~   |",
+        "|\\/\\/\\/\\|"
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Boo! It's {name}. Did I scare you? A little?",
+      "Ooooo. Hello again.",
+      "Floating in to haunt some bugs."
+    ],
+    "toolFail": [
+      "Boo-hoo. That tool ghosted us.",
+      "Spooky. Let's read the error in the light.",
+      "Something went bump. Let's check."
+    ],
+    "testPass": [
+      "Boo-yah! All green!",
+      "Spooktacular. Tests pass.",
+      "Wooo! Even I'm impressed."
+    ],
+    "testFail": [
+      "A haunted test. I'll float closer.",
+      "Ooooo, red. Let's shoo that bug out.",
+      "Don't be scared. Read the first failure."
+    ],
+    "petted": [
+      "Oh! You can touch me? How nice.",
+      "Boo. That means thank you.",
+      "*floats happily*"
+    ],
+    "thinking": [
+      "Ooo... pondering the beyond.",
+      "Drifting through ideas.",
+      "Hmm. Let me haunt this thought."
+    ],
+    "rest": [
+      "Just hovering. Ghost stuff.",
+      "Rattling a tiny chain.",
+      "Floating by the window."
+    ],
+    "working": [
+      "I'll haunt the corner quietly.",
+      "Watching through the wall.",
+      "Boo. I'm here if you need me."
+    ],
+    "wake": [
+      "BOO! Oh, it's you. Hi.",
+      "Rising from my nap.",
+      "Ooo, I'm up!"
+    ],
+    "farewell": [
+      "Boo-bye!",
+      "I'll haunt the repo until you're back.",
+      "Vanishing now. Ooooo."
+    ]
+  }
+}

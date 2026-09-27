@@ -221,6 +221,7 @@ export function sceneOf(b: Brain): Scene | null {
     sleeping: b.sleeping,
     zTick: b.motion.stillFrame,
     stats: { pets: b.pets, questions: b.questions },
+    now: b.now,
   });
   if (scene && scene.x !== b.motion.x) b.motion = { ...b.motion, x: scene.x };
   return scene;

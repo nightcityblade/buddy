@@ -1,17 +1,25 @@
 import type { EngineInterface, ModelForkResult, On, PluginOptions, Register, Timer, ToolCallInput, ToolCallResult } from 'claude-code';
 import {
-  answer, beginQuestion, createBrain, endTurn, failAnswer, farewell, greet, observeBand, period, pet, react, sceneOf, setCharacter, tick, wake,
+  BUBBLE_MS, ERROR_MS, answer, beginQuestion, createBrain, endTurn, failAnswer, farewell, greet, observeBand, period, pet, react, sceneOf, setCharacter, speak,
+  tick, wake,
   type Brain,
 } from '../src/brain.ts';
+import {
+  ADOPTED_ID, SHOWN_CONFIG, SOUL_MAX_TOKENS, SOUL_SYSTEM, adoptCharacter, adoptChoiceOf, adoptReply, companionOf, identityOf, isBackupName,
+  newestFirst, parseSoul, savedSoulOf, soulKey, soulPrompt, welcomeLine,
+  type AdoptChoice, type Soul, type SoulOrigin,
+} from '../src/adopt.ts';
 import { USAGE, parseCommand } from '../src/command.ts';
 import { expandHome, resolveOptions, type Options } from '../src/options.ts';
 import { QUESTION_MAX_TOKENS, QUIP_MAX_TOKENS, forkPrompt, oneLine, oneLineSystem, questionPrompt, quipPrompt, type TurnSummary } from '../src/prompts.ts';
+import { identityKey, maskIdentity, roll, type Roll } from '../src/hatch.ts';
 import { bashCommand, toolOutput } from '../src/reactions.ts';
 import {
-  choose, findEntry, formatList, isCharacterFile, loadEntries, mergeRoster, validIds,
+  choose, findEntry, formatList, isCharacterFile, loadEntries, mergeRoster, validIds, withEntry,
   type Entry, type LoadedFile, type Roster, type Source,
 } from '../src/roster.ts';
 import type { Scene } from '../src/scene.ts';
+import { validateHats, validateSpecies, type HatArt, type SpeciesTemplate } from '../src/species.ts';
 
 // The adapter: the only file touching `$`. Every decision lives in ../src/;
 // this wires Claude Code's events to it, grouped by event, and draws the scene.
@@ -23,6 +31,9 @@ type State = {
   roster: Roster;
   b: Brain | null;
   storeChoice: string | undefined;
+  /** The adopted companion's roster entry, once /buddy adopt (or a restart) loaded it. */
+  adopted: Entry | null;
+  adoptChoice: AdoptChoice | undefined;
   hidden: boolean;
   pets: number;
   timer: Timer | null;
@@ -76,6 +87,7 @@ async function loadRoster(st: State, $: EngineInterface): Promise<void> {
     user = mine.entries;
   }
   st.roster = mergeRoster(builtin.entries, user, errors);
+  if (st.adopted) st.roster = withEntry(st.roster, st.adopted);
   for (const e of errors) $.ui.log(`buddy: ${e}`);
   for (const e of st.roster.entries) if (e.error) $.ui.log(`buddy: character ${e.id} (${e.source}) is invalid: ${e.error}`);
 }
@@ -144,15 +156,21 @@ async function readStore(st: State, $: EngineInterface): Promise<void> {
   } catch (error) {
     log($, 'reading the /buddy use choice', error);
   }
+  try {
+    st.adoptChoice = adoptChoiceOf(await $.store.get('adopt'));
+  } catch (error) {
+    log($, 'reading the /buddy adopt choice', error);
+  }
 }
 
 async function startSession(st: State, $: EngineInterface): Promise<void> {
   for (const e of st.options.errors) $.ui.log(`buddy: ${e}`);
   await readStore(st, $);
   await loadRoster(st, $);
+  if ((st.storeChoice ?? st.options.character) === ADOPTED_ID) await restoreAdopted(st, $);
   applyChoice(st, $);
   try {
-    await $.command.register({ name: COMMAND, description: 'Pet your buddy, ask it something, or: list, use {id}, off, on, reload, help', argumentHint: '[question] | list | use {id} | off | on | reload | help', immediate: true });
+    await $.command.register({ name: COMMAND, description: 'Pet your buddy, ask it something, or: list, use {id}, adopt [npm], off, on, reload, help', argumentHint: '[question] | list | use {id} | adopt [from {path}] [npm] | off | on | reload | help', immediate: true });
   } catch (error) {
     log($, `registering /${COMMAND}`, error);
   }
@@ -249,6 +267,240 @@ function onTurnComplete(st: State, $: EngineInterface): void {
   } catch (error) {
     log($, 'the end of a turn', error);
   }
+}
+
+// ---- /buddy adopt -------------------------------------------------------
+
+/** What an adoption found: the bones, the art, and the soul unless it must be hatched. */
+type Found = {
+  /** The identity as it may be shown (its last 4 characters) and as a store key (its hash). */
+  account: string;
+  idHash: string;
+  choice: AdoptChoice;
+  roll: Roll;
+  template: SpeciesTemplate;
+  hats: HatArt;
+  soul?: Soul;
+  origin?: SoulOrigin;
+  notes: string[];
+};
+
+/** A JSON file, parsed: an error names the file and why, never its contents. */
+async function readJson($: EngineInterface, path: string, shown: string): Promise<{ value?: unknown; error?: string }> {
+  let text: unknown;
+  try {
+    text = await $.fs.read(path);
+  } catch (error) {
+    return { error: `couldn't read ${shown}: ${message(error)}` };
+  }
+  if (typeof text !== 'string') return { error: `couldn't read ${shown}: not text` };
+  try {
+    return { value: JSON.parse(text) };
+  } catch (error) {
+    // The parser's message may quote the file: only its kind is said.
+    return { error: `couldn't parse ${shown}: not valid JSON (${error instanceof Error ? error.name : typeof error})` };
+  }
+}
+
+async function homeOf($: EngineInterface): Promise<string | undefined> {
+  try {
+    const home = await $.env.get('HOME');
+    return home ? home.replace(/\/+$/, '') : undefined;
+  } catch (error) {
+    log($, 'reading HOME', error);
+    return undefined;
+  }
+}
+
+/** The species template, and the hat art when the companion wears a hat. */
+async function loadArt($: EngineInterface, r: Roll): Promise<{ template?: SpeciesTemplate; hats: HatArt; error?: string }> {
+  const dir = `${$.plugin.root}/species`;
+  const species = r.bones.species;
+  const file = await readJson($, `${dir}/${species}.json`, `species/${species}.json`);
+  if (file.error) return { hats: {}, error: file.error };
+  const v = validateSpecies(file.value, species);
+  if (!v.ok) return { hats: {}, error: `species/${species}.json is invalid: ${v.error}` };
+  if (r.bones.hat === 'none') return { template: v.template, hats: {} };
+  const hats = await readJson($, `${dir}/hats.json`, 'species/hats.json');
+  if (hats.error) return { hats: {}, error: hats.error };
+  const h = validateHats(hats.value);
+  if (!h.ok) return { hats: {}, error: `species/hats.json is invalid: ${h.error}` };
+  return { template: v.template, hats: h.hats };
+}
+
+/** The newest backup of ~/.claude.json that parses and holds a companion; `notes` says what could not be looked at. */
+async function backupSoul($: EngineInterface, home: string, notes: string[]): Promise<{ soul: Soul; label: string } | null> {
+  const found: { path: string; label: string; name: string }[] = [];
+  try {
+    for (const f of await $.fs.list(home)) if (f.kind !== 'dir' && isBackupName(f.name)) found.push({ path: `${home}/${f.name}`, label: `~/${f.name}`, name: f.name });
+  } catch (error) {
+    log($, 'listing ~ for .claude.json backups', error);
+    notes.push(`Couldn't list ~ to look for .claude.json backups: ${message(error)}`);
+  }
+  const dir = `${home}/.claude/backups`;
+  try {
+    // No backups folder is no backups; a folder that cannot be listed is said.
+    if (await $.fs.exists(dir)) for (const f of await $.fs.list(dir)) if (f.kind !== 'dir') found.push({ path: `${dir}/${f.name}`, label: `~/.claude/backups/${f.name}`, name: f.name });
+  } catch (error) {
+    log($, 'listing ~/.claude/backups', error);
+    notes.push(`Couldn't list ~/.claude/backups: ${message(error)}`);
+  }
+  const dated = await Promise.all(
+    found.map(async (c) => {
+      try {
+        return { ...c, mtimeMs: (await $.fs.stat(c.path)).mtimeMs };
+      } catch (error) {
+        log($, `reading the date of ${c.label}`, error);
+        return { ...c, mtimeMs: 0 };
+      }
+    }),
+  );
+  let skipped = 0;
+  for (const c of dated.sort(newestFirst)) {
+    const j = await readJson($, c.path, c.label);
+    if (j.error) {
+      skipped++;
+      $.ui.log(`buddy: skipping a backup: ${j.error}`);
+      continue;
+    }
+    const s = companionOf(j.value);
+    if (s.soul) return { soul: s.soul, label: c.label };
+  }
+  if (skipped > 0) notes.push(`Skipped ${skipped} backup${skipped === 1 ? '' : 's'} that did not read or parse.`);
+  return null;
+}
+
+/**
+ * Everything /buddy adopt needs: the config read (never written), the bones
+ * rolled, the art loaded, and the soul from the file, our store or (with
+ * `scanBackups`) the newest backup. No soul: the caller hatches one.
+ */
+async function findAdoption($: EngineInterface, choice: AdoptChoice, scanBackups: boolean): Promise<Found | { error: string }> {
+  const home = await homeOf($);
+  let path: string;
+  const shown = choice.path ?? SHOWN_CONFIG;
+  if (choice.path) path = expandHome(choice.path, home);
+  else if (home) path = `${home}/.claude.json`;
+  else return { error: `couldn't read ${SHOWN_CONFIG}: HOME is not set` };
+  const config = await readJson($, path, shown);
+  if (config.error !== undefined) return { error: config.error };
+  const identity = identityOf(config.value);
+  const companion = companionOf(config.value);
+  if (companion.error) return { error: `${shown} has a companion, but ${companion.error}` };
+  const r = roll(identity, choice.variant);
+  const art = await loadArt($, r);
+  if (!art.template) return { error: art.error ?? `no species art for the ${r.bones.species}` };
+  const found: Found = { account: maskIdentity(identity), idHash: identityKey(identity), choice, roll: r, template: art.template, hats: art.hats, notes: [] };
+  if (companion.soul) return { ...found, soul: companion.soul, origin: { kind: 'file' } };
+  try {
+    const saved = savedSoulOf(await $.store.get(soulKey(found.idHash, choice.variant)));
+    if (saved.soul) return { ...found, soul: saved.soul, origin: saved.label ? { kind: 'backup', label: saved.label } : { kind: 'saved' } };
+  } catch (error) {
+    log($, 'reading the saved soul', error);
+    found.notes.push(`Couldn't read the saved soul: ${message(error)}`);
+  }
+  if (!scanBackups) return found;
+  if (choice.path) {
+    found.notes.push(`Backups are looked for only beside ${SHOWN_CONFIG}, not beside ${choice.path}.`);
+    return found;
+  }
+  const backup = await backupSoul($, home!, found.notes);
+  return backup ? { ...found, soul: backup.soul, origin: { kind: 'backup', label: backup.label } } : found;
+}
+
+/** Draws the adopted companion and remembers it: an error switches nothing. */
+async function switchToAdopted(st: State, $: EngineInterface, f: Found, soul: Soul, origin: SoulOrigin): Promise<{ error?: string; note: string }> {
+  const b = st.b;
+  if (!b) return { error: 'buddy is still starting; try again in a moment', note: '' };
+  const v = adoptCharacter({ soul, bones: f.roll.bones, variant: f.choice.variant, template: f.template, hats: f.hats });
+  if (!v.ok) return { error: v.error, note: '' };
+  st.adopted = { id: ADOPTED_ID, source: 'adopted', character: v.character };
+  st.roster = withEntry(st.roster, st.adopted);
+  st.storeChoice = ADOPTED_ID;
+  st.adoptChoice = f.choice;
+  let note = await save($, 'character', ADOPTED_ID);
+  note += await save($, 'adopt', f.choice.path ? { variant: f.choice.variant, path: f.choice.path } : { variant: f.choice.variant });
+  if (origin.kind === 'hatched' || origin.kind === 'backup') {
+    note += await save($, soulKey(f.idHash, f.choice.variant), origin.kind === 'backup' ? { ...soul, from: origin.label } : soul);
+  }
+  setCharacter(b, v.character, undefined, Math.random);
+  speak(b, welcomeLine(origin, soul.name), 'yay', BUBBLE_MS);
+  startClock(st, $);
+  st.lastKey = '';
+  $.ui.invalidate('ui.render');
+  return { note };
+}
+
+/** No soul anywhere: the model names one (JSON, validated, one retry), then the switch. */
+async function hatch(st: State, $: EngineInterface, f: Found): Promise<void> {
+  const b = st.b;
+  if (!b) return;
+  const bones = f.roll.bones;
+  let error = '';
+  try {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const r = await $.model.complete({ model: st.options.quipModel, system: SOUL_SYSTEM, prompt: soulPrompt(bones, f.roll.inspirationSeed, error), maxTokens: SOUL_MAX_TOKENS });
+      const p = r.isAnswered ? parseSoul(r.text) : { error: r.reason };
+      if (p.soul) {
+        const done = await switchToAdopted(st, $, f, { ...p.soul, hatchedAt: Date.now() }, { kind: 'hatched' });
+        if (done.error === undefined) {
+          if (done.note) $.ui.log(`buddy: /buddy adopt${done.note}`);
+          return;
+        }
+        error = done.error;
+        break;
+      }
+      error = p.error ?? 'no soul in the reply';
+      $.ui.log(`buddy: hatching a soul, attempt ${attempt}: ${error}`);
+    }
+  } catch (err) {
+    log($, 'hatching a soul', err);
+    error = message(err);
+  }
+  $.ui.log(`buddy: /buddy adopt failed: couldn't hatch a soul: ${error}`);
+  speak(b, `Couldn't hatch a soul for your ${bones.species}: ${error}`, 'oops', ERROR_MS);
+  refresh(st, $);
+}
+
+async function adopt(st: State, $: EngineInterface, choice: AdoptChoice): Promise<string> {
+  const f = await findAdoption($, choice, true);
+  if ('error' in f) {
+    $.ui.log(`buddy: /buddy adopt failed: ${f.error}`);
+    return `/buddy adopt: ${f.error}. Nothing was switched.`;
+  }
+  if (f.soul && f.origin) {
+    const done = await switchToAdopted(st, $, f, f.soul, f.origin);
+    if (done.error !== undefined) {
+      $.ui.log(`buddy: /buddy adopt failed: ${done.error}`);
+      return `/buddy adopt: ${done.error}. Nothing was switched.`;
+    }
+    return adoptReply({ name: f.soul.name, bones: f.roll.bones, variant: choice.variant, origin: f.origin, account: f.account, notes: f.notes }) + done.note;
+  }
+  hatch(st, $, f).catch((error) => log($, 'hatching a soul', error));
+  const where = choice.path ?? `${SHOWN_CONFIG}, its backups or a saved soul`;
+  const b = f.roll.bones;
+  return [`No companion found in ${where}: hatching a new soul for your ${b.rarity} ${b.species}${b.shiny ? ' (shiny!)' : ''} (account ${f.account}, rolled as the ${choice.variant} install did).`, ...f.notes].join('\n');
+}
+
+/** At start, with "adopted" chosen: the companion again, never a new hatch. */
+async function restoreAdopted(st: State, $: EngineInterface): Promise<void> {
+  const choice: AdoptChoice = st.adoptChoice ?? { variant: 'native' };
+  let error: string;
+  try {
+    const f = await findAdoption($, choice, false);
+    if ('error' in f) error = f.error;
+    else if (!f.soul) error = `no companion in ${choice.path ?? SHOWN_CONFIG} and no saved soul; /buddy adopt looks again`;
+    else {
+      const v = adoptCharacter({ soul: f.soul, bones: f.roll.bones, variant: choice.variant, template: f.template, hats: f.hats });
+      error = v.ok ? '' : v.error;
+      if (v.ok) st.adopted = { id: ADOPTED_ID, source: 'adopted', character: v.character };
+    }
+  } catch (err) {
+    log($, 'restoring the adopted buddy', err);
+    error = message(err);
+  }
+  if (error) st.adopted = { id: ADOPTED_ID, source: 'adopted', error };
+  if (st.adopted) st.roster = withEntry(st.roster, st.adopted);
 }
 
 // ---- command.run: /buddy ------------------------------------------------
@@ -351,6 +603,8 @@ async function runCommand(st: State, $: EngineInterface, args: string): Promise<
         const bad = st.roster.entries.filter((e) => !e.character).length;
         return { text: `Reloaded ${st.roster.entries.length} characters (${bad} invalid); drawing ${b.character.name}` };
       }
+      case 'adopt':
+        return { text: await adopt(st, $, action.path ? { variant: action.variant, path: action.path } : { variant: action.variant }) };
       case 'help':
         return { text: [USAGE, ...st.options.errors].join('\n') };
       case 'usage':
@@ -378,6 +632,8 @@ export const register: Register = (on: On, options: PluginOptions) => {
     roster: mergeRoster([], []),
     b: null,
     storeChoice: undefined,
+    adopted: null,
+    adoptChoice: undefined,
     hidden: false,
     pets: 0,
     timer: null,

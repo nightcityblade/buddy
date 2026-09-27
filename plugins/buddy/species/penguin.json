@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "penguin",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "   ({E} {E})   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   ({E} {E})   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   ({E} {E})   ",
+        " _/( v )\\  ",
+        "   (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   ({E} {E})   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   ({E} {E})   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   (- -)   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "   ({E} {E})   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "   ^   ^   "
+      ],
+      [
+        "           ",
+        "   ({E} {E})   ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "   ({E} {E})  !",
+        " \\_( o )_/ ",
+        "   (   )   ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "!  ({E} {E})   ",
+        " \\_( o )_/ ",
+        "   (   )   ",
+        "   ^   ^   "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        " \\ ({E} {E}) / ",
+        "  \\( v )/  ",
+        "   (   )   ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        " * ({E} {E}) * ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "   ^   ^   "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "   (- -) z ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   (- -) z ",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   (- -)  Z",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ],
+      [
+        "           ",
+        "   (- -)  Z",
+        "  /( v )\\  ",
+        " / (   ) \\ ",
+        "    ^ ^    "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Good day. {name}, reporting in formal attire.",
+      "Tuxedo on. Ready to work.",
+      "Waddle waddle. Hello!"
+    ],
+    "toolFail": [
+      "Slipped on the ice. Let's get up and read the error.",
+      "A slight chill. We'll warm it up.",
+      "Most irregular. Shall we look closer?"
+    ],
+    "testPass": [
+      "Splendid! A celebratory belly slide.",
+      "All green. Very dapper.",
+      "Passing tests. How cool."
+    ],
+    "testFail": [
+      "A red test. Keep calm, stay cool.",
+      "Hmm. Let's slide down to the first failure.",
+      "Chilly news. Nothing we cannot fix."
+    ],
+    "petted": [
+      "Oh! Careful with the tux.",
+      "Very kind. Flipper shake?",
+      "*waddles happily*"
+    ],
+    "thinking": [
+      "Thinking coolly...",
+      "Hmm. Let me slide into this idea.",
+      "Pondering on an ice floe."
+    ],
+    "rest": [
+      "Just standing here, looking sharp.",
+      "A cool breeze. Lovely.",
+      "Huddling for warmth. Just me."
+    ],
+    "working": [
+      "Keeping things cool while you work.",
+      "Standing by, dressed for success.",
+      "Waddle mode: quiet."
+    ],
+    "wake": [
+      "Oh! Brr. I'm up.",
+      "Straightening my bow tie. Awake!",
+      "Hm? Yes. Ready."
+    ],
+    "farewell": [
+      "Farewell. Stay cool.",
+      "*waddles off politely*",
+      "See you on the ice."
+    ]
+  }
+}

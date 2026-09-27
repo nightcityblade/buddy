@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "octopus",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\ _",
+        "(__/ ' \\_/ "
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        "  ( - - )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ],
+      [
+        "           ",
+        "   .---.   ",
+        "  ( {E} {E} )  ",
+        "  \\(|||)/  ",
+        " _)/ ' \\(_ "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "   .---.  !",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/.:.\\__)"
+      ],
+      [
+        "           ",
+        "   .---. ! ",
+        "  ( {E} {E} )  ",
+        "  \\(|||)/  ",
+        " _)/.:.\\(_ "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        "\\_ .---. _/",
+        "  ( {E} {E} )  ",
+        "  _)|||(_  ",
+        " (__/ \\__) "
+      ],
+      [
+        "           ",
+        " \\ .---. /*",
+        "  ( {E} {E} )  ",
+        " _/)|||(\\_ ",
+        "(__/ ' \\__)"
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "   .---.  z",
+        "  ( - - )  ",
+        " _/)___(\\_ ",
+        "(___/ \\___)"
+      ],
+      [
+        "           ",
+        "   .---.  z",
+        "  ( - - )  ",
+        " _/)___(\\_ ",
+        "(___/ \\___)"
+      ],
+      [
+        "           ",
+        "   .---.  Z",
+        "  ( - - )  ",
+        " _/)___(\\_ ",
+        "(___/ \\___)"
+      ],
+      [
+        "           ",
+        "   .---.  Z",
+        "  ( - - )  ",
+        " _/)___(\\_ ",
+        "(___/ \\___)"
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hello! {name} has eight arms and all of them are waving.",
+      "Ready to multitask. Times eight.",
+      "Blub! Let's get tangled up in some code."
+    ],
+    "toolFail": [
+      "Whoops, that one slipped through my suckers.",
+      "Inked a little. Let's try again.",
+      "Eight arms and still dropped it. Retry?"
+    ],
+    "testPass": [
+      "Green! Eight high-fives!",
+      "All passing! Doing a little swirl.",
+      "Wonderful. Every tentacle approves."
+    ],
+    "testFail": [
+      "A red test. One arm on the log, one on the code...",
+      "Hmm. Let me untangle this one.",
+      "Failure spotted. Grabbing it gently."
+    ],
+    "petted": [
+      "Ooh! Hugging you back with at least three arms.",
+      "Blub! That's nice.",
+      "Suction-cup high five!"
+    ],
+    "thinking": [
+      "Thinking with all nine brains.",
+      "Hmm... swirling it around.",
+      "Give me a moment to untangle this."
+    ],
+    "rest": [
+      "Floating in the current.",
+      "Hiding in a nice rock for a moment.",
+      "Changing color to 'relaxed'."
+    ],
+    "working": [
+      "Holding the docs, the logs, and a snack.",
+      "I've got arms free if you need them.",
+      "Quietly juggling."
+    ],
+    "wake": [
+      "Blub?! Oh, hello!",
+      "Unfurling! I'm here.",
+      "Awake. All arms accounted for."
+    ],
+    "farewell": [
+      "Bye! Waving with every arm.",
+      "See you on the next tide.",
+      "I'll keep the reef tidy."
+    ]
+  }
+}

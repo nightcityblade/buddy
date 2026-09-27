@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "dragon",
+  "width": 12,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^ ~ ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)_> "
+      ],
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( -  - )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ]
+    ],
+    "walkRight": [
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^   ",
+        "\\/( {E}  {E} )\\/",
+        "/\\ (.__.) /\\",
+        "  (_)  (_)~>"
+      ]
+    ],
+    "oops": [
+      [
+        "            ",
+        "   ^.--.^  !",
+        "/\\( {E}  {E} )/\\",
+        "\\/ ( ~~ ) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^ ! ",
+        "\\/( {E}  {E} )\\/",
+        "/\\ ( ~~ ) /\\",
+        "   (_)(_)~> "
+      ]
+    ],
+    "yay": [
+      [
+        "            ",
+        "   ^.--.^   ",
+        "/\\( {E}  {E} )/\\",
+        "\\/ (.__.)>~*",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        " * ^.--.^ * ",
+        "\\/( {E}  {E} )\\/",
+        "/\\ (.__.) /\\",
+        "   (_)(_)~> "
+      ]
+    ],
+    "sleep": [
+      [
+        "            ",
+        "   ^.--.^ z ",
+        "/\\( -  - )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^ z ",
+        "/\\( -  - )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^  Z",
+        "/\\( -  - )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ],
+      [
+        "            ",
+        "   ^.--.^  Z",
+        "/\\( -  - )/\\",
+        "\\/ (.__.) \\/",
+        "   (_)(_)~> "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Behold! {name} returns to guard your code.",
+      "Greetings, keeper of the repo. My hoard awaits.",
+      "Rawr. Politely."
+    ],
+    "toolFail": [
+      "A tool dares defy us? I shall glare at it warmly.",
+      "Singed. Let's read the ashes.",
+      "Hmph. Even dragons trip on stairs."
+    ],
+    "testPass": [
+      "Another green test for my hoard!",
+      "RAWR! Victory smells like smoke and success.",
+      "Gold! Well, green. Same thing to a dragon."
+    ],
+    "testFail": [
+      "A red test. A worthy foe. Let's study it.",
+      "My flames are ready. But first, the stack trace.",
+      "Hmm. Let us slay this bug with care."
+    ],
+    "petted": [
+      "Careful, my scales are warm. ...But continue.",
+      "A pat? For a mighty dragon? ...Thank you.",
+      "Puff! That was a happy puff."
+    ],
+    "thinking": [
+      "Consulting ancient scrolls...",
+      "Hmm. Warming up a thought.",
+      "Let me smoulder on it."
+    ],
+    "rest": [
+      "Counting my hoard. Three green tests, four...",
+      "A small nap on a pile of commits.",
+      "Polishing a scale."
+    ],
+    "working": [
+      "I'll guard the cave while you work.",
+      "Watching from my perch.",
+      "Keeping the forge warm."
+    ],
+    "wake": [
+      "Who disturbs my slumber? Oh, you. Welcome.",
+      "Rawr?! Ahem. I'm awake.",
+      "Yawn. Tiny flame. Ready."
+    ],
+    "farewell": [
+      "Fly safe, keeper. The hoard is guarded.",
+      "Until the next quest.",
+      "I'll keep the embers glowing."
+    ]
+  }
+}

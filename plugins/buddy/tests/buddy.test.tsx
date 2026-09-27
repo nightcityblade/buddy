@@ -1,5 +1,6 @@
 import type { On } from 'claude-code';
 import { describe, expect, mock, test } from 'claude-code/testing';
+import { roll } from '../src/hatch.ts';
 
 // Run with `claude plugin test plugins/buddy` (CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1).
 // The plugin loads from this folder; `on` here sits beneath it and answers
@@ -44,14 +45,30 @@ const FILES: Record<string, string> = {
 };
 
 type Answer = { isAnswered: boolean; text?: string; reason?: string; usage?: object };
+/** Files by absolute path (with their mtimes), and whether listing the home folder is refused. */
+type Disk = { files?: Record<string, string>; mtimes?: Record<string, number>; refuseHome?: boolean };
 
-function world(on: On, store: Record<string, unknown> = {}, answers: { fork?: Answer; complete?: Answer } = {}) {
+const HOME = '/test-home';
+
+function world(on: On, store: Record<string, unknown> = {}, answers: { fork?: Answer; complete?: Answer; queue?: Answer[] } = {}, disk: Disk = {}) {
   const logs: string[] = [];
   const forks: string[] = [];
   const completes: { model: string; system?: string; prompt: string }[] = [];
   const usage = { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
   const commands: string[] = [];
+  const writes: string[] = [];
+  const queue = [...(answers.queue ?? [])];
   const saved = new Map(Object.entries(store));
+  const files = disk.files ?? {};
+  on('env.get', async (_$, e) => ({ value: e.name === 'HOME' ? HOME : undefined }));
+  on('fs.write', async (_$, e) => {
+    writes.push(e.path);
+    return { value: undefined };
+  });
+  on('fs.stat', async (_$, e) => {
+    if (files[e.path] === undefined) throw new Error(`ENOENT: ${e.path}`);
+    return { value: { kind: 'file' as const, size: files[e.path]!.length, mtimeMs: disk.mtimes?.[e.path] ?? 0, isLink: false } };
+  });
   on('store.get', async (_$, e) => ({ value: saved.get(e.key) }));
   on('store.set', async (_$, e) => {
     saved.set(e.key, e.value);
@@ -71,11 +88,22 @@ function world(on: On, store: Record<string, unknown> = {}, answers: { fork?: An
     return { value: { command: e.name } };
   });
   on('session.start', async (_$, e) => ({ cwd: e.cwd }));
+  on('fs.exists', async (_$, e) => ({ value: Object.keys(files).some((f) => f === e.path || f.startsWith(`${e.path}/`)) }));
   on('fs.list', async (_$, e) => {
+    if (e.path === HOME || e.path.startsWith(`${HOME}/`)) {
+      // A thrown answer reaches the plugin as the kit's own rejection, not this message.
+      if (disk.refuseHome && e.path === HOME) throw new Error(`EPERM: not allowed to list ${e.path}`);
+      const names = Object.keys(files).filter((f) => f.startsWith(`${e.path}/`) && !f.slice(e.path.length + 1).includes('/'));
+      return { value: names.map((f) => ({ name: f.slice(e.path.length + 1), kind: 'file' as const, size: files[f]!.length, isLink: false })) };
+    }
     if (!e.path.endsWith('/characters')) throw new Error(`ENOENT: ${e.path}`);
     return { value: Object.entries(FILES).map(([name, text]) => ({ name, kind: 'file' as const, size: text.length, isLink: false })) };
   });
   on('fs.read', async (_$, e) => {
+    if (files[e.path] !== undefined) return { value: files[e.path]! };
+    const art = /\/species\/([a-z]+)\.json$/.exec(e.path);
+    if (art) return { value: art[1] === 'hats' ? HAT_ART : speciesArt(art[1]!) };
+    if (e.path.startsWith(`${HOME}/`)) throw new Error(`ENOENT: ${e.path}`);
     const text = FILES[e.path.split('/').pop() ?? ''];
     if (text === undefined) throw new Error(`ENOENT: ${e.path}`);
     return { value: text };
@@ -86,9 +114,9 @@ function world(on: On, store: Record<string, unknown> = {}, answers: { fork?: An
   });
   on('model.complete', async (_$, e) => {
     completes.push({ model: e.model, system: e.system, prompt: e.prompt });
-    return { value: { usage, ...(answers.complete ?? { isAnswered: true, text: 'A completed answer.' }) } } as never;
+    return { value: { usage, ...(queue.shift() ?? answers.complete ?? { isAnswered: true, text: 'A completed answer.' }) } } as never;
   });
-  return { logs, forks, completes, clock, commands, saved };
+  return { logs, forks, completes, clock, commands, saved, writes };
 }
 
 function run(args: string) {
@@ -296,6 +324,168 @@ describe('reactions', () => {
     const ui = await band($);
     await $.tool.call({ tool: 'Bash', command: 'npm test' } as never);
     expect(await shows(ui, /Fixy: red!/)).toBe(true);
+    await ui.unmount();
+  });
+});
+
+// ---- /buddy adopt ---------------------------------------------------------
+
+// An invented account and companion: never a real ~/.claude.json.
+const UUID = '7e57ab1e-0000-4c0d-9e11-5eedf00dcafe';
+const MOCHI = { name: 'Mochi', personality: 'A round little creature who hums at green tests.', hatchedAt: 1775001600000 };
+const CONFIG = `${HOME}/.claude.json`;
+const HAT_ART = JSON.stringify({ crown: 'www', tophat: '_|_', propeller: '-+-', halo: '(_)', wizard: '/^\\', beanie: '(__)', tinyduck: '<o)' });
+const B = '        ';
+
+function speciesArt(species: string): string {
+  const eyes = '  <{E}{E}>  ';
+  const body = '  /__\\  ';
+  return JSON.stringify({
+    species,
+    width: 8,
+    hatCol: 3,
+    poses: {
+      idle: [[B, eyes, body], [B, eyes, body], [B, '  <-->  ', body]],
+      walkRight: [[B, eyes, body], [B, eyes, '  /  \\  ']],
+      oops: [[B, eyes, '  /!!\\  ']],
+      yay: [[B, eyes, '  \\__/  ']],
+      sleep: [[B, '  <-->  ', body]],
+    },
+    lines: { greeting: ['{name} says hello.'] },
+  });
+}
+
+function config(companion?: object): string {
+  return JSON.stringify({ userID: 'an-invented-user-id', oauthAccount: { accountUuid: UUID }, ...(companion ? { companion } : {}) });
+}
+
+function eyesOf(variant: 'native' | 'npm'): RegExp {
+  const e = roll(UUID, variant).bones.eye.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`<${e}${e}>`);
+}
+
+function title(name: string, variant: 'native' | 'npm'): string {
+  const b = roll(UUID, variant).bones;
+  return `${name} the ${b.rarity} ${b.species}${b.shiny ? ' (shiny!)' : ''}`;
+}
+
+describe('/buddy adopt', () => {
+  test('brings back the companion in ~/.claude.json: drawn, greeted, remembered, listed; the file is never written', async ($, on) => {
+    const w = world(on, {}, {}, { files: { [CONFIG]: config(MOCHI) } });
+    await $.session.start(START);
+    const ui = await band($);
+    const text = (await $.command.run(run('adopt'))).text ?? '';
+    expect(text.split('\n')).toEqual([`${title('Mochi', 'native')} is back.`, 'Account …cafe, rolled as the native install did.', 'Hatched on an npm install? /buddy adopt npm']);
+    expect(await shows(ui, /Welcome back, Mochi!/)).toBe(true);
+    expect(await shows(ui, eyesOf('native'))).toBe(true);
+    expect(w.saved.get('character')).toBe('adopted');
+    expect(w.saved.get('adopt')).toEqual({ variant: 'native' });
+    expect((await $.command.run(run('list'))).text).toContain('* adopted - Mochi: ');
+    expect((await $.command.run(run('use default'))).text).toBe('Back to the default: Professor Fixture');
+    expect(w.saved.has('character')).toBe(false);
+    expect((await $.command.run(run('list'))).text).toContain('  adopted - Mochi: ');
+    expect(w.writes).toEqual([]);
+    expect(w.logs.join('\n')).not.toContain(UUID);
+    expect([...w.saved.keys()].join(' ')).not.toContain(UUID);
+    await ui.unmount();
+  });
+
+  test('npm rolls as the npm install did; from {path} reads that file', async ($, on) => {
+    const w = world(on, {}, {}, { files: { [CONFIG]: config(MOCHI), '/elsewhere/old.json': config({ ...MOCHI, name: 'Biscuit' }) } });
+    await $.session.start(START);
+    const ui = await band($);
+    const npm = (await $.command.run(run('adopt npm'))).text ?? '';
+    expect(npm).toContain(`${title('Mochi', 'npm')} is back.`);
+    expect(npm).toContain('Hatched on the native install? /buddy adopt');
+    expect(await shows(ui, eyesOf('npm'))).toBe(true);
+    expect(w.saved.get('adopt')).toEqual({ variant: 'npm' });
+    expect((await $.command.run(run('adopt from /elsewhere/old.json'))).text).toContain(`${title('Biscuit', 'native')} is back.`);
+    expect(w.saved.get('adopt')).toEqual({ variant: 'native', path: '/elsewhere/old.json' });
+    await ui.unmount();
+  });
+
+  test('a read or parse failure is said plainly, switches nothing, and never shows the file', async ($, on) => {
+    const w = world(on, { character: 'fixy' }, {}, { files: { '/elsewhere/bad.json': '{"secretToken": oops' } });
+    await $.session.start(START);
+    const missing = (await $.command.run(run('adopt'))).text ?? '';
+    expect(missing).toMatch(/^\/buddy adopt: couldn't read ~\/\.claude\.json: .+\. Nothing was switched\.$/);
+    const bad = (await $.command.run(run('adopt from /elsewhere/bad.json'))).text ?? '';
+    expect(bad).toBe("/buddy adopt: couldn't parse /elsewhere/bad.json: not valid JSON (SyntaxError). Nothing was switched.");
+    expect(w.logs.join('\n')).not.toContain('secretToken');
+    expect(w.saved.get('character')).toBe('fixy');
+    expect(w.saved.has('adopt')).toBe(false);
+  });
+
+  test('no companion: the newest backup that holds one, named, its soul saved under a hash', async ($, on) => {
+    const files = {
+      [CONFIG]: config(),
+      [`${HOME}/.claude.json.bak-20260401`]: config({ ...MOCHI, name: 'Oldie' }),
+      [`${HOME}/.claude.json.backup`]: config({ ...MOCHI, name: 'Middle' }),
+      [`${HOME}/.claude/backups/.claude.json.backup.1775`]: config({ ...MOCHI, name: 'Newest' }),
+      [`${HOME}/.claude.json.lock`]: 'not json',
+    };
+    const mtimes = { [`${HOME}/.claude.json.bak-20260401`]: 1, [`${HOME}/.claude.json.backup`]: 3, [`${HOME}/.claude/backups/.claude.json.backup.1775`]: 4, [`${HOME}/.claude.json.lock`]: 5 };
+    const w = world(on, {}, {}, { files, mtimes });
+    await $.session.start(START);
+    const text = (await $.command.run(run('adopt'))).text ?? '';
+    expect(text).toContain(`${title('Newest', 'native')} is back.`);
+    expect(text).toContain('Its soul came from the backup ~/.claude/backups/.claude.json.backup.1775.');
+    expect(text).not.toContain("Couldn't");
+    const key = [...w.saved.keys()].find((k) => k.startsWith('soul:'));
+    expect(key).toMatch(/^soul:[0-9a-f]{16}:native$/);
+    expect(w.saved.get(key!)).toMatchObject({ name: 'Newest', from: '~/.claude/backups/.claude.json.backup.1775' });
+    expect(w.completes).toEqual([]);
+  });
+
+  test('no soul anywhere: the model hatches one (JSON, validated, one retry), then it arrives', async ($, on) => {
+    const good = { isAnswered: true, text: '{"name": "Pip", "personality": "A tiny thing who adores tidy diffs."}' };
+    const w = world(on, {}, { queue: [{ isAnswered: true, text: 'Pip!' }, good] }, { files: { [CONFIG]: config() } });
+    await $.session.start(START);
+    const ui = await band($);
+    const b = roll(UUID, 'native').bones;
+    const text = (await $.command.run(run('adopt'))).text ?? '';
+    expect(text).toContain(`No companion found in ~/.claude.json, its backups or a saved soul: hatching a new soul for your ${b.rarity} ${b.species}`);
+    await w.clock.settle();
+    expect(w.completes).toHaveLength(2);
+    expect(w.completes[0]?.system).toContain('Reply with one JSON object and nothing else');
+    expect(w.completes[0]?.prompt).toContain(`Species: ${b.species}`);
+    expect(w.completes[1]?.prompt).toContain('Your last reply was not usable (no JSON object in the reply)');
+    expect(await shows(ui, /Hello! I'm Pip\./)).toBe(true);
+    expect(w.saved.get('character')).toBe('adopted');
+    const key = [...w.saved.keys()].find((k) => k.startsWith('soul:'));
+    expect(w.saved.get(key!)).toMatchObject({ name: 'Pip', personality: 'A tiny thing who adores tidy diffs.' });
+    await ui.unmount();
+  });
+
+  test('a home it cannot list is said, then it hatches; two bad answers switch nothing', async ($, on) => {
+    const bad = { isAnswered: false, reason: 'api-error' };
+    const w = world(on, { character: 'fixy' }, { queue: [bad, bad] }, { files: { [CONFIG]: config() }, refuseHome: true });
+    await $.session.start(START);
+    const ui = await band($);
+    const text = (await $.command.run(run('adopt'))).text ?? '';
+    expect(text).toMatch(/\nCouldn't list ~ to look for \.claude\.json backups: \S/);
+    await w.clock.settle();
+    expect(w.completes).toHaveLength(2);
+    expect(await shows(ui, new RegExp(`Couldn't hatch a soul for your ${roll(UUID, 'native').bones.species}: api-error`))).toBe(true);
+    expect(w.saved.get('character')).toBe('fixy');
+    await ui.unmount();
+  });
+
+  test('a restart draws the adopted companion again; a lost file says so', async ($, on) => {
+    world(on, { character: 'adopted', adopt: { variant: 'native' } }, {}, { files: { [CONFIG]: config(MOCHI) } });
+    await $.session.start(START);
+    const ui = await band($);
+    expect(await shows(ui, eyesOf('native'))).toBe(true);
+    expect(await shows(ui, /Mochi says hello\./)).toBe(true);
+    await ui.unmount();
+  });
+
+  test('a restart without the file draws the professor and says why', async ($, on) => {
+    world(on, { character: 'adopted', adopt: { variant: 'npm' } });
+    await $.session.start(START);
+    const ui = await band($);
+    expect(await shows(ui, /\(p_p\)/)).toBe(true);
+    expect(await shows(ui, /Couldn't load adopted: couldn't read ~\/\.claude\.json/)).toBe(true);
     await ui.unmount();
   });
 });

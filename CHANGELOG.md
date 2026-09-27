@@ -4,6 +4,14 @@ Every release of buddy. Versions follow [semantic versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-09-27
+
+### Added
+- `/buddy adopt`: brings back the companion Claude Code's own `/buddy` hatched for your account before version 2.1.97 removed it. It reads `~/.claude.json` (never writes it), recomputes the same species, rarity, eyes, hat, shiny and stats exactly as the native install did, and draws them with buddy's own art for all 18 species. `/buddy adopt npm` gives the companion the npm install rolled; `/buddy adopt from {path}` reads another copy of the file.
+- The adopted companion's name and personality come from the `companion` saved in `~/.claude.json`, else from the newest `~/.claude.json` backup that holds one (named in the reply), else from a new soul hatched with one `quipModel` call. The choice survives restarts; `/buddy list` shows it as `adopted`, and `/buddy use default` leaves it.
+- An adopted companion wears its rarity's color; a shiny one cycles through the rainbow with a sparkle. Its hover card shows the species, stars, five stat bars and the day it hatched. The account id is never logged and shows only as its last four characters.
+- `schema/species.schema.json`, the contract of a species template and its hat art.
+
 ## [0.1.0] — 2026-09-27
 
 ### Added

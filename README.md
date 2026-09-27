@@ -5,7 +5,7 @@
 **A tiny companion that walks on your Claude Code prompt line and talks back: the Professor by default, five more characters built in, or your own.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![CI](https://github.com/rezzminator/buddy/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/rezzminator/buddy/actions/workflows/ci.yml)
 [![Built with Professor](https://img.shields.io/badge/built%20with-Professor-8A2BE2)](https://github.com/rezzminator/professor)
@@ -41,6 +41,9 @@ buddy server to go quiet.
 - 💬 **Talks back.** `/buddy why is this slow?` gets a one-line answer, in
   character. By default the question forks this chat: the same model, the
   whole conversation in view, served from its prompt cache.
+- 🐣 **Your own buddy, back.** `/buddy adopt` recomputes the companion
+  Claude Code hatched for your account (species, rarity, eyes, hat, stats)
+  and brings it back with the name and personality it saved.
 - 🎭 **Six characters, and yours.** Pick one with `/buddy use`, or draw your
   own: a JSON file with a persona and a few poses of ASCII art.
 - 🤫 **Free unless you ask.** Walking, petting, switching and reactions never
@@ -85,6 +88,8 @@ prompt; type `/buddy` to pet him.
 | `/buddy use default` | Forget the `/buddy use` choice and go back to the `character` option. |
 | `/buddy off` / `/buddy on` | Hide or show it, remembered across restarts. |
 | `/buddy reload` | Rescan the characters, after you edit one. |
+| `/buddy adopt [npm]` | Bring back the companion Claude Code hatched for your account (see [Bring back your buddy](#-bring-back-your-buddy)). |
+| `/buddy adopt from {path} [npm]` | The same, from another copy of `~/.claude.json`. |
 | `/buddy help` | Usage. |
 | `/buddy {anything else}` | A question: it thinks, then answers in one line, in character (see `questionMode`). |
 
@@ -102,6 +107,43 @@ prompt; type `/buddy` to pet him.
 The choice is, in order: your last `/buddy use`, then the `character`
 option, then `professor`. Your own characters sit beside these, and one with
 a built-in's id replaces it.
+
+## 🐣 Bring back your buddy
+
+Claude Code's own `/buddy` hatched one companion per account: one of 18
+species, a rarity from common to legendary, eyes, a hat, a rare shiny, and
+five stats. That look was never saved. Claude Code worked it out from your
+account id every time it drew it. What it did save, in `~/.claude.json`, was
+the name and personality it gave your companion, and often it is still
+there.
+
+`/buddy adopt` does the same calculation, exactly, and brings that companion
+back to your prompt line:
+
+- It reads `~/.claude.json` for your account id and the saved `companion`.
+  It only reads the file; it never writes it.
+- It works out the same species, rarity, eyes, hat, shiny and stats, and
+  draws them with buddy's own art, in the color of its rarity. A shiny one
+  shimmers through the rainbow with a sparkle.
+- The name and personality come from the saved companion. If
+  `~/.claude.json` no longer has one, it looks through your backups
+  (`~/.claude.json.*` and `~/.claude/backups/`) and tells you which one it
+  used. If there is none anywhere, it hatches a new name and personality
+  with one short `quipModel` call.
+- It switches to your companion and remembers it. `/buddy list` shows it as
+  `adopted`, it is still there after a restart, and `/buddy use default`
+  goes back to your other character.
+
+| Command | What it does |
+| --- | --- |
+| `/buddy adopt` | Your companion as the native install rolled it (Claude Code installed with its own installer). |
+| `/buddy adopt npm` | Your companion as the npm install rolled it (`npm install -g @anthropic-ai/claude-code`). The two installs turned your id into a companion differently, so if the one you get is a stranger, try the other. |
+| `/buddy adopt from {path}` | The same, from another copy of `~/.claude.json`: a backup, or one from another machine. Add `npm` at the end for the npm roll. |
+
+Hover over the adopted companion for its card: name, species, stars, shiny,
+the five stats as bars (`SNARK     ████████░░ 81`), and the day it
+hatched. Your account id stays on your machine. The reply shows only its
+last four characters, and nothing from `~/.claude.json` is ever logged.
 
 ## 🧠 How it works
 
@@ -198,9 +240,11 @@ working example, how to test it, and how to send it in to ship with buddy.
 <summary><b>Is this the <code>/buddy</code> that Claude Code removed?</b></summary>
 
 No. buddy is an independent plugin, not a patch to Claude Code or a revival
-of the removed code. You choose the character instead of hatching one from
-your account, and its reactions come from its own lines and from your own
-model calls, not from a server.
+of the removed code. You choose a character, and its reactions come from its
+own lines and from your own model calls, not from a server. But
+`/buddy adopt` does bring back the companion the removed `/buddy` hatched
+for your account: the same species, rarity, eyes, hat and stats, recomputed
+from your account id, with the name and personality `~/.claude.json` kept.
 </details>
 
 <details>

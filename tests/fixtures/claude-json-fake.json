@@ -1,0 +1,13 @@
+{
+  "numStartups": 3,
+  "userID": "0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f",
+  "oauthAccount": {
+    "accountUuid": "7e57ab1e-0000-4c0d-9e11-5eedf00dcafe",
+    "emailAddress": "nobody@example.invalid"
+  },
+  "companion": {
+    "name": "Pumpernickel",
+    "personality": "A crumb-loving little creature who hums while the tests run and gasps at every stack trace.",
+    "hatchedAt": 1775001600000
+  }
+}

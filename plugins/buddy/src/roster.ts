@@ -6,7 +6,7 @@ import { validateCharacter, type Character } from './character.ts';
 
 export const DEFAULT_ID = 'professor';
 
-export type Source = 'builtin' | 'user';
+export type Source = 'builtin' | 'user' | 'adopted';
 export type Entry = { id: string; source: Source; character?: Character; error?: string };
 export type Roster = { entries: Entry[]; errors: string[] };
 /** A listed file: its text, or why it could not be read. */
@@ -42,6 +42,11 @@ export function mergeRoster(builtins: readonly Entry[], users: readonly Entry[],
   for (const e of builtins) byId.set(e.id, e);
   for (const e of users) byId.set(e.id, e);
   return { entries: [...byId.values()].sort((a, b) => a.id.localeCompare(b.id)), errors: [...errors] };
+}
+
+/** The roster with `e` in it, replacing any entry of its id. */
+export function withEntry(r: Roster, e: Entry): Roster {
+  return { entries: [...r.entries.filter((x) => x.id !== e.id), e].sort((a, b) => a.id.localeCompare(b.id)), errors: r.errors };
 }
 
 export function findEntry(r: Roster, id: string): Entry | undefined {

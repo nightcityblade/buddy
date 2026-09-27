@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "chonk",
+  "width": 12,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        " /\\.----./| ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '-u----u-'~"
+      ],
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  -    -  )",
+        "( =  ww  = )",
+        " '-u----u-' "
+      ]
+    ],
+    "walkRight": [
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( =  ww  = )",
+        " '--u--u--' "
+      ]
+    ],
+    "oops": [
+      [
+        "            ",
+        " /\\.----./\\!",
+        "(  {E}    {E}  )",
+        "( =  ()  = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        "!/|.----.|\\ ",
+        "(  {E}    {E}  )",
+        "( =  ()  = )",
+        " '-u----u-' "
+      ]
+    ],
+    "yay": [
+      [
+        "            ",
+        "*/\\.----./\\*",
+        "(  {E}    {E}  )",
+        "( = \\__/ = )",
+        " '-u----u-' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\ ",
+        "(  {E}    {E}  )",
+        "( = \\__/ = )",
+        " '--u--u--'~"
+      ]
+    ],
+    "sleep": [
+      [
+        "            ",
+        " /\\.----./\\z",
+        "(  -    -  )",
+        "( =  ~~  = )",
+        " '--------' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\z",
+        "(  -    -  )",
+        "( =  ~~  = )",
+        " '--------' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\Z",
+        "(  -    -  )",
+        "( =  ~~  = )",
+        " '--------' "
+      ],
+      [
+        "            ",
+        " /\\.----./\\Z",
+        "(  -    -  )",
+        "( =  ~~  = )",
+        " '--------' "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hello. {name} is here. Mostly the round part.",
+      "Hi. Did you bring snacks?",
+      "Chonk has arrived. The chair creaks."
+    ],
+    "toolFail": [
+      "Oof. Even I couldn't sit on that problem.",
+      "That tool is not a snack. Try again.",
+      "Hmm. Let me roll over and look."
+    ],
+    "testPass": [
+      "Green! That deserves a treat.",
+      "Purrfect. Snack time?",
+      "All passing. I'll celebrate by lying down."
+    ],
+    "testFail": [
+      "A red test. I will sit on it until it behaves.",
+      "Oof. Let's look at the first one. Then snacks.",
+      "A failure. Heavy. But so am I."
+    ],
+    "petted": [
+      "Purrr. More belly. No wait, not the belly.",
+      "Yes. Scritch the chonk.",
+      "Mmm. Happy loaf."
+    ],
+    "thinking": [
+      "Thinking... or napping. Hard to tell.",
+      "Hmm. Chewing on it.",
+      "Big thoughts for a big cat."
+    ],
+    "rest": [
+      "Loaf mode.",
+      "A small snack break. Medium. Large.",
+      "Rolling onto my other side."
+    ],
+    "working": [
+      "I'll sit on your notes to keep them safe.",
+      "Watching. From a comfortable position.",
+      "Carry on. I'm supervising, horizontally."
+    ],
+    "wake": [
+      "Mrrf? Is it dinner?",
+      "Yawn. I'm up. Mostly.",
+      "Oh. Hello. Snacks?"
+    ],
+    "farewell": [
+      "Bye. Leave the heater on.",
+      "See you. I'll be exactly here.",
+      "Nap time. Goodbye."
+    ]
+  }
+}

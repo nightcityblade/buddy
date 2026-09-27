@@ -26,6 +26,10 @@ export type Character = {
   motion: Motion;
   width: number;
   height: number;
+  /** An adopted companion: the sprite color cycles through the rainbow each tick. */
+  shiny?: boolean;
+  /** An adopted companion: the hover card's second line, and the rows below its stats line. */
+  card?: { subtitle: string; rows: readonly string[] };
 };
 
 export type Validation = { ok: true; character: Character } | { ok: false; error: string };
@@ -59,13 +63,13 @@ export const POSE_FALLBACK: Record<Pose, Pose | null> = {
   sleep: 'rest',
 };
 
-class Invalid extends Error {}
+export class Invalid extends Error {}
 
-function fail(error: string): never {
+export function fail(error: string): never {
   throw new Invalid(error);
 }
 
-function isObject(v: unknown): v is Record<string, unknown> {
+export function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
@@ -133,7 +137,7 @@ function poses(v: unknown, walk: boolean): Partial<Record<Pose, Frame[]>> {
   return out;
 }
 
-function lines(v: unknown): Partial<Record<LineEvent, string[]>> {
+export function parseLines(v: unknown): Partial<Record<LineEvent, string[]>> {
   if (v === undefined) return {};
   if (!isObject(v)) fail('lines: must be an object of event name to lines');
   const out: Partial<Record<LineEvent, string[]>> = {};
@@ -181,7 +185,7 @@ export function validateCharacter(raw: unknown, fileId?: string): Validation {
     const col = color(raw.color);
     const mot = motion(raw.motion);
     const norm = normalizeFrames(poses(raw.poses, mot.walk));
-    const character: Character = { id, name, description, persona, color: col, poses: norm.poses, lines: lines(raw.lines), motion: mot, width: norm.width, height: norm.height };
+    const character: Character = { id, name, description, persona, color: col, poses: norm.poses, lines: parseLines(raw.lines), motion: mot, width: norm.width, height: norm.height };
     if (author !== undefined) character.author = author;
     return { ok: true, character };
   } catch (error) {

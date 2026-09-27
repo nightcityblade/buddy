@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "rabbit",
+  "width": 9,
+  "hatCol": 4,
+  "poses": {
+    "idle": [
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E},{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( -.- ) ",
+        "  (u u)  "
+      ]
+    ],
+    "walkRight": [
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        " _/u u\\_ "
+      ]
+    ],
+    "oops": [
+      [
+        "         ",
+        "  () () !",
+        "  || ||  ",
+        " ( {E}~{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        " ()   () ",
+        "  \\\\ // !",
+        " ( {E}~{E} ) ",
+        "  (u u)  "
+      ]
+    ],
+    "yay": [
+      [
+        "         ",
+        " ()   () ",
+        "  \\\\ //  ",
+        " ( {E}.{E} ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () () *",
+        "  || ||  ",
+        " ( {E}.{E} ) ",
+        " _/u u\\_ "
+      ]
+    ],
+    "sleep": [
+      [
+        "         ",
+        "  () () z",
+        "  || ||  ",
+        " ( -.- ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () () z",
+        "  || ||  ",
+        " ( -.- ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || || Z",
+        " ( -.- ) ",
+        "  (u u)  "
+      ],
+      [
+        "         ",
+        "  () ()  ",
+        "  || || Z",
+        " ( -.- ) ",
+        "  (u u)  "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hop hop! {name} is here!",
+      "Hi! Ears up, ready to go.",
+      "Hello! Let's be quick about it."
+    ],
+    "toolFail": [
+      "Oops, wrong burrow. Let's hop back.",
+      "Thump! That tool said no.",
+      "Hmm, a snag. Quick retry?"
+    ],
+    "testPass": [
+      "Hop hop hooray!",
+      "Green! Happy zoomies!",
+      "All passing! That was quick."
+    ],
+    "testFail": [
+      "A red test. Careful, don't go down a rabbit hole.",
+      "Thump. First failure first.",
+      "Ears up. Let's listen to the error."
+    ],
+    "petted": [
+      "Nose wiggle! Thank you!",
+      "Ooh, right between the ears.",
+      "Happy thump!"
+    ],
+    "thinking": [
+      "Hopping between ideas...",
+      "Hmm. Nose twitching.",
+      "Let me dig into that."
+    ],
+    "rest": [
+      "Munching a carrot.",
+      "Flopped. Very comfy.",
+      "A quick nap in the clover."
+    ],
+    "working": [
+      "Ears up, watching.",
+      "Hopping quietly beside you.",
+      "I'll keep lookout."
+    ],
+    "wake": [
+      "Eep! Oh, it's you!",
+      "Ears up! Awake!",
+      "Twitch twitch. Ready."
+    ],
+    "farewell": [
+      "Bye! Hop along now.",
+      "See you! I'll save you a carrot.",
+      "Off to my burrow."
+    ]
+  }
+}

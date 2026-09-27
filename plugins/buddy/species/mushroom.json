@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "mushroom",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        " . |{E} {E}| . ",
+        "   |___| : "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |- -|   ",
+        "   |___|   "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   /_ _\\   "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |_ _|   "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "  .-'O'-. !",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |_o_|   "
+      ],
+      [
+        "           ",
+        "! .-'O'-.  ",
+        " (o_____o) ",
+        " : |{E} {E}| : ",
+        "   |_o_|   "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        "* .-'O'-. *",
+        " (o_____o) ",
+        "   |{E} {E}|   ",
+        "   |\\_/|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-.  ",
+        " (o_____o) ",
+        " * |{E} {E}| * ",
+        "   /\\_/\\   "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "  .-'O'-. z",
+        " (o_____o) ",
+        "   |- -|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-. z",
+        " (o_____o) ",
+        "   |- -|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-. Z",
+        " (o_____o) ",
+        "   |- -|   ",
+        "   |___|   "
+      ],
+      [
+        "           ",
+        "  .-'O'-. Z",
+        " (o_____o) ",
+        "   |- -|   ",
+        "   |___|   "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hello! {name} popped up overnight.",
+      "Hi! Rooted and ready.",
+      "Spores out, friend. Let's grow something."
+    ],
+    "toolFail": [
+      "Hmm, that one didn't take root. Let's try again.",
+      "A little damp. We'll dry it out.",
+      "The mycelium says: check the log."
+    ],
+    "testPass": [
+      "Green! I'm sprouting with joy.",
+      "Everything's growing nicely.",
+      "Passing! A fine little crop."
+    ],
+    "testFail": [
+      "A red one. Let's dig down to the root.",
+      "Something's off in the soil. First failure first.",
+      "Don't worry. Good things grow from mistakes."
+    ],
+    "petted": [
+      "Oh! Gentle on the cap.",
+      "Aww. A few happy spores.",
+      "Thank you! I feel taller."
+    ],
+    "thinking": [
+      "Asking the mycelium network...",
+      "Growing a thought.",
+      "Hmm. Let me break this down. Decomposing is my thing."
+    ],
+    "rest": [
+      "Enjoying the shade.",
+      "Soaking up some rain.",
+      "Just quietly growing."
+    ],
+    "working": [
+      "I'll grow quietly over here.",
+      "Listening through the roots.",
+      "Carry on. I'm a fun guy to have around."
+    ],
+    "wake": [
+      "Oh! Popped up again.",
+      "Mm, morning dew. Hello!",
+      "Awake and sprouting."
+    ],
+    "farewell": [
+      "Bye! I'll keep the forest floor warm.",
+      "See you after the next rain.",
+      "Spore-y to see you go."
+    ]
+  }
+}

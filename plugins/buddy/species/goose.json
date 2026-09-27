@@ -1,0 +1,198 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "goose",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "    ({E}>    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "    ({E}>    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "     ({E}>   ",
+        "    //     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "    ({E}>    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "    ({E}>    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "    (->    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "    ({E}>    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "   /  \\    "
+      ],
+      [
+        "           ",
+        "    ({E}>    ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    ||     "
+      ]
+    ],
+    "walkLeft": [
+      [
+        "           ",
+        "    <{E})    ",
+        "     ||    ",
+        "  (__||_/> ",
+        "    /  \\   "
+      ],
+      [
+        "           ",
+        "    <{E})    ",
+        "     ||    ",
+        "  (__||_/> ",
+        "     ||    "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "    ({E}<  ! ",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "    ({E}<   !",
+        "    ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        "    ({E}>  * ",
+        "  \\ ||     ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        " *  ({E}<    ",
+        "    || /   ",
+        " <\\_||__)  ",
+        "   /  \\    "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "       z   ",
+        "    (->    ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "       z   ",
+        "    (->    ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "        Z  ",
+        "    (->    ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ],
+      [
+        "           ",
+        "        Z  ",
+        "    (->    ",
+        " <\\_||__)  ",
+        "    /\\     "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "HONK. {name} has arrived. Nobody panic.",
+      "Honk! What are we getting into today?",
+      "I'm back, and I brought my attitude."
+    ],
+    "toolFail": [
+      "HONK! That tool looked at me funny.",
+      "Let's chase that error off the lawn.",
+      "Honk. I'll hiss at it; you read the log."
+    ],
+    "testPass": [
+      "HONK HONK! Victory lap around the lake!",
+      "Green! I shall now strut.",
+      "All passing. The pond salutes us."
+    ],
+    "testFail": [
+      "Honk. One test is being difficult. I respect that, but still.",
+      "Red! Let's go bother it until it talks.",
+      "A failure! Finally, something to chase."
+    ],
+    "petted": [
+      "...Fine. You may pat the goose.",
+      "Honk. That was acceptable.",
+      "Careful. I only nibble bugs."
+    ],
+    "thinking": [
+      "Honk... plotting.",
+      "Give me a moment to scheme.",
+      "Thinking, with maximum honk."
+    ],
+    "rest": [
+      "Standing on one leg. Showing off.",
+      "A short hiss-break.",
+      "I'm not lazy. I'm quietly majestic."
+    ],
+    "working": [
+      "I'll guard the terminal. Nobody gets past.",
+      "Watching. Beak ready.",
+      "Carry on. I'm on patrol."
+    ],
+    "wake": [
+      "HONK?! Who's there? Oh, it's you.",
+      "I was not asleep. I was lying in wait.",
+      "Up! Ready to cause mild chaos."
+    ],
+    "farewell": [
+      "Honk. The lawn is yours tonight.",
+      "Leaving? Fine. I'll honk at the sunset.",
+      "See you, partner in chaos."
+    ]
+  }
+}

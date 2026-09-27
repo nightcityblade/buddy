@@ -1,0 +1,182 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "owl",
+  "width": 10,
+  "hatCol": 4,
+  "poses": {
+    "idle": [
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        "//(:::)\\\\ ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\  ",
+        "((-)v(-)) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ]
+    ],
+    "walkRight": [
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        " ^^   ^^  "
+      ],
+      [
+        "          ",
+        " /\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        "   ^^^    "
+      ]
+    ],
+    "oops": [
+      [
+        "          ",
+        " /\\___/\\ !",
+        "(({E})o({E})) ",
+        "\\/(:::)\\/ ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\! ",
+        "(({E})o({E})) ",
+        "/\\(:::)/\\ ",
+        "  ^^ ^^   "
+      ]
+    ],
+    "yay": [
+      [
+        "          ",
+        " /\\___/\\ *",
+        "(({E})v({E})) ",
+        "\\\\(:::)// ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        "*/\\___/\\  ",
+        "(({E})v({E})) ",
+        " /(:::)\\  ",
+        " ^^   ^^  "
+      ]
+    ],
+    "sleep": [
+      [
+        "          ",
+        " /\\___/\\ z",
+        "((-)v(-)) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\ z",
+        "((-)v(-)) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\Z ",
+        "((-)v(-)) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ],
+      [
+        "          ",
+        " /\\___/\\Z ",
+        "((-)v(-)) ",
+        " /(:::)\\  ",
+        "  ^^ ^^   "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hoo! {name} is watching, wisely.",
+      "Good evening. It's always evening somewhere.",
+      "Hoo-hoo. Let's think carefully today."
+    ],
+    "toolFail": [
+      "Hoo. Look again; the answer is in the message.",
+      "A setback. Wisdom is mostly reading the error twice.",
+      "Hmm. Patience. Let's read it slowly."
+    ],
+    "testPass": [
+      "Hoo! Well reasoned.",
+      "Green, as I foresaw. Mostly.",
+      "A wise change. The tests agree."
+    ],
+    "testFail": [
+      "Hoo. Start with the first failure; the rest often follow.",
+      "A red test is a riddle. We like riddles.",
+      "Look closer. Owls see in the dark."
+    ],
+    "petted": [
+      "Hoo. Most kind.",
+      "Soft feathers, soft heart.",
+      "A gentle pat. Wise choice."
+    ],
+    "thinking": [
+      "Hoo... considering.",
+      "Let me turn my head all the way around on this.",
+      "Wisdom takes a moment."
+    ],
+    "rest": [
+      "A quiet perch.",
+      "Watching the moon a moment.",
+      "Resting my eyes. One at a time."
+    ],
+    "working": [
+      "Watching over your shoulder, silently.",
+      "I'll keep watch.",
+      "Hoo. Carry on."
+    ],
+    "wake": [
+      "Hoo?! Ah. Night shift begins.",
+      "I'm awake. I'm nearly always awake.",
+      "Blink. Blink. Ready."
+    ],
+    "farewell": [
+      "Hoo. Rest well; I'll keep watch.",
+      "Goodnight, wise one.",
+      "Until the next moonrise."
+    ]
+  }
+}

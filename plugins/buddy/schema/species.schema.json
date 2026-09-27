@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rezzminator/buddy/plugins/buddy/schema/species.schema.json",
+  "title": "buddy species template",
+  "description": "species/{species}.json: the sprite an adopted companion wears (/buddy adopt). The engine fills in the rolled eye for each {E}, overlays the hat on row 0, and colors it by rarity. Frames are the blank hat row plus 1 to 4 body rows, every row exactly `width` columns with {E} counted as one. Lines may use {name}.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "species",
+    "width",
+    "hatCol",
+    "poses"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "species": {
+      "description": "Equals the file name.",
+      "enum": [
+        "duck",
+        "goose",
+        "blob",
+        "cat",
+        "dragon",
+        "octopus",
+        "owl",
+        "penguin",
+        "turtle",
+        "snail",
+        "ghost",
+        "axolotl",
+        "capybara",
+        "cactus",
+        "robot",
+        "rabbit",
+        "mushroom",
+        "chonk"
+      ]
+    },
+    "width": {
+      "description": "Columns of every row, {E} counted as one.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "hatCol": {
+      "description": "The column the hat is centered on; below width.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 11
+    },
+    "poses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idle",
+        "walkRight",
+        "oops",
+        "yay",
+        "sleep"
+      ],
+      "properties": {
+        "idle": {
+          "$ref": "#/$defs/frames",
+          "minItems": 3
+        },
+        "walkRight": {
+          "$ref": "#/$defs/frames",
+          "minItems": 2
+        },
+        "walkLeft": {
+          "$ref": "#/$defs/frames"
+        },
+        "rest": {
+          "$ref": "#/$defs/frames"
+        },
+        "oops": {
+          "$ref": "#/$defs/frames"
+        },
+        "yay": {
+          "$ref": "#/$defs/frames"
+        },
+        "thinking": {
+          "$ref": "#/$defs/frames"
+        },
+        "petted": {
+          "$ref": "#/$defs/frames"
+        },
+        "working": {
+          "$ref": "#/$defs/frames"
+        },
+        "sleep": {
+          "$ref": "#/$defs/frames"
+        }
+      }
+    },
+    "lines": {
+      "description": "Event name to canned one-liners; {name} becomes the companion's name.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "greeting": {
+          "$ref": "#/$defs/pool"
+        },
+        "toolFail": {
+          "$ref": "#/$defs/pool"
+        },
+        "testPass": {
+          "$ref": "#/$defs/pool"
+        },
+        "testFail": {
+          "$ref": "#/$defs/pool"
+        },
+        "petted": {
+          "$ref": "#/$defs/pool"
+        },
+        "thinking": {
+          "$ref": "#/$defs/pool"
+        },
+        "rest": {
+          "$ref": "#/$defs/pool"
+        },
+        "working": {
+          "$ref": "#/$defs/pool"
+        },
+        "wake": {
+          "$ref": "#/$defs/pool"
+        },
+        "farewell": {
+          "$ref": "#/$defs/pool"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/frame"
+      }
+    },
+    "frame": {
+      "description": "Row 0 is the hat row, all spaces; then 1 to 4 body rows. Printable ASCII; {E} marks an eye; sleep and blink frames draw eyes as -.",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 5,
+      "prefixItems": [
+        {
+          "type": "string",
+          "pattern": "^ *$"
+        }
+      ],
+      "items": {
+        "type": "string",
+        "pattern": "^[\\x20-\\x7E]*$"
+      }
+    },
+    "pool": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      }
+    }
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "duck",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})=   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})=   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})<   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})=   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})=   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "  L  L     "
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})=   ",
+        " \\____)    ",
+        " L   L     "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "\\__( {E})=   ",
+        " \\____)    ",
+        "   LL      "
+      ]
+    ],
+    "walkLeft": [
+      [
+        "           ",
+        "    .-.    ",
+        "   =({E} )__/",
+        "    (____/ ",
+        "     J   J "
+      ],
+      [
+        "           ",
+        "    .-.    ",
+        "   =({E} )__/",
+        "    (____/ ",
+        "      JJ   "
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "    .-. !  ",
+        "\\__( {E})<   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-.  ! ",
+        "\\__( {E})<   ",
+        " \\____)    ",
+        "  L  L     "
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        " *  .-.    ",
+        "\\__( {E})=   ",
+        " \\_\\/_)    ",
+        "  L  L     "
+      ],
+      [
+        "           ",
+        "    .-. *  ",
+        "\\__( {E})<   ",
+        " \\_/\\_)    ",
+        "  L  L     "
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "    .-. z  ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ],
+      [
+        "           ",
+        "    .-. z  ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ],
+      [
+        "           ",
+        "    .-.  Z ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ],
+      [
+        "           ",
+        "    .-.  Z ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Quack! {name} is here and ready to listen.",
+      "Explain it to me like I'm a duck. Because I am.",
+      "Fresh pond, fresh bugs. Let's paddle."
+    ],
+    "toolFail": [
+      "Quack. Say that part out loud again, slowly?",
+      "Hmm. Walk me through what you expected.",
+      "That one splashed. Let's dry off and retry."
+    ],
+    "testPass": [
+      "QUACK! All green, like pond weed.",
+      "Tests pass. I'm doing a little waddle.",
+      "See? Explaining it to a duck works."
+    ],
+    "testFail": [
+      "Red. Tell me the story of that first failure.",
+      "Quack. Start at the top line and read it to me.",
+      "A failing test? I'm all ears. Well, all feathers."
+    ],
+    "petted": [
+      "Quack! Smooth feathers, happy duck.",
+      "Oh! A pat. {name} approves.",
+      "Squeak. That was my happy squeak."
+    ],
+    "thinking": [
+      "Quack... thinking it over.",
+      "Paddling on it. Underwater, very fast.",
+      "Hmm. Duck brain engaged."
+    ],
+    "rest": [
+      "A little float. Just a little one.",
+      "Bobbing gently. Very important work.",
+      "Preening. Back in a moment."
+    ],
+    "working": [
+      "I'll just sit here and listen.",
+      "Quiet duck mode. Carry on.",
+      "Watching the code go by like ripples."
+    ],
+    "wake": [
+      "Quack?! I was only resting my bill.",
+      "Oh! Back already? Good.",
+      "Awake! Where's the bug?"
+    ],
+    "farewell": [
+      "Quack quack. See you at the pond.",
+      "Bye! I'll keep the bugs company.",
+      "Off you go. {name} will guard the pond."
+    ]
+  }
+}

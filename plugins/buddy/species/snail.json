@@ -1,0 +1,198 @@
+{
+  "$schema": "../schema/species.schema.json",
+  "species": "snail",
+  "width": 11,
+  "hatCol": 5,
+  "poses": {
+    "idle": [
+      [
+        "           ",
+        "   .---. {E}{E}",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. {E}{E}",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---.{E} {E}",
+        "  ( .-. )\\|",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. {E}{E}",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. {E}{E}",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. --",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ]
+    ],
+    "walkRight": [
+      [
+        "           ",
+        "   .---. {E}{E}",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. {E}{E}",
+        "  ( .-. )\\\\",
+        "  ( '@' )/ ",
+        "~ '-----'-'"
+      ]
+    ],
+    "walkLeft": [
+      [
+        "           ",
+        "{E}{E} .---.   ",
+        "||( .-. )  ",
+        " \\( '@' )  ",
+        "'-'-----'~ "
+      ],
+      [
+        "           ",
+        "{E}{E} .---.   ",
+        "//( .-. )  ",
+        " \\( '@' )  ",
+        "'-'-----' ~"
+      ]
+    ],
+    "oops": [
+      [
+        "           ",
+        "   .---.  !",
+        "  ( .-. )  ",
+        "  ( '@' ){E}{E}",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. ! ",
+        "  ( .-. )  ",
+        "  ( '@' ){E}{E}",
+        " ~'-----'-'"
+      ]
+    ],
+    "yay": [
+      [
+        "           ",
+        " * .---. {E}{E}",
+        "  ( .-. )||",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "*  .---.{E} {E}",
+        "  ( .-. )\\/",
+        "  ( '@' )/ ",
+        " ~'-----'-'"
+      ]
+    ],
+    "sleep": [
+      [
+        "           ",
+        "   .---. z ",
+        "  ( .-. )  ",
+        "  ( '@' )--",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---. z ",
+        "  ( .-. )  ",
+        "  ( '@' )--",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---.  Z",
+        "  ( .-. )  ",
+        "  ( '@' )--",
+        " ~'-----'-'"
+      ],
+      [
+        "           ",
+        "   .---.  Z",
+        "  ( .-. )  ",
+        "  ( '@' )--",
+        " ~'-----'-'"
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Hello! {name} slid in, leaving a sparkly trail.",
+      "Home is where the shell is. And now, here.",
+      "Eyes up! Let's go, at a gentle pace."
+    ],
+    "toolFail": [
+      "Oop. Tucking my eyes in. Okay, peeking again.",
+      "That tool was salty. Let's retry.",
+      "Tiny setback. Snails are good at tiny."
+    ],
+    "testPass": [
+      "Green! My eyestalks are wiggling.",
+      "Worth the slow climb.",
+      "Passing! Leaving a victory trail."
+    ],
+    "testFail": [
+      "A red one. Let's inch toward the first failure.",
+      "Hmm, a bump. We'll slide around it.",
+      "Slow down, read the error. Snail advice."
+    ],
+    "petted": [
+      "Oh, careful of the shell! ...Nice.",
+      "My stalks are happy.",
+      "Squish. Thank you."
+    ],
+    "thinking": [
+      "Thinking at snail speed. Thorough, though.",
+      "Hmm... inching toward an idea.",
+      "Let me spiral on this."
+    ],
+    "rest": [
+      "A little nap in my portable home.",
+      "Enjoying the dew.",
+      "Pausing on a leaf."
+    ],
+    "working": [
+      "Sliding alongside you.",
+      "Leaving helpful trails.",
+      "Watching with both eyes up."
+    ],
+    "wake": [
+      "Eyes out! Hello!",
+      "Peeking out of my shell. Morning?",
+      "Oh! Unrolling. Awake."
+    ],
+    "farewell": [
+      "Bye! Follow the shiny trail home.",
+      "See you! I'll be about here.",
+      "Home's on my back. I'm all set."
+    ]
+  }
+}

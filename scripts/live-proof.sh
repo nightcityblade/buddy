@@ -11,6 +11,9 @@
 #   (f) a /buddy question after a reply (a fork of the chat) is answered
 #   (g) /buddy use {another} draws another character; use default returns
 #   (h) /buddy off hides the band; /buddy on brings it back
+#   (i) /buddy adopt from tests/fixtures/claude-json-fake.json (an invented
+#       account and companion; HOME stays real, a fake one logs the session
+#       out) greets that companion by name; /buddy use default returns
 # Prints a table, one row per check, and exits 1 when any check fails,
 # 2 when the session could not be driven (no transcript, a turn timed out).
 # Spends real tokens: a few cents of Haiku. It resets this plugin's own
@@ -157,6 +160,18 @@ out=$(command_out "/buddy off"); sleep 3
 if ! shows_any "$RUN/professor.rows"; then add "(h) /buddy off hides" PASS "$out"; else add "(h) /buddy off hides" FAIL "still drawn"; fi
 out=$(command_out "/buddy on"); sleep 3
 if shows_any "$RUN/professor.rows"; then add "(h) /buddy on shows" PASS "$out"; else add "(h) /buddy on shows" FAIL "not drawn"; fi
+
+FAKE=$ROOT/tests/fixtures/claude-json-fake.json
+NAME=$(jq -r '.companion.name' "$FAKE")
+out=$(command_out "/buddy adopt from $FAKE")
+b=$(bubble)
+if grep -q -F "$NAME the " <<<"$out" && grep -q -F "is back." <<<"$out"; then add "(i) /buddy adopt from a fake config" PASS "$out"; else add "(i) /buddy adopt from a fake config" FAIL "$out"; fi
+if grep -q -F "Welcome back, $NAME" <<<"$b"; then add "(i) the bubble greets $NAME" PASS "$b"; else add "(i) the bubble greets $NAME" FAIL "bubble: $b"; fi
+pane > "$RUN/i.txt"
+# The invented account rolls a common snail; its shell row has no eyes, so it reads the same in every frame.
+if grep -q -F "( '@' )" "$RUN/i.txt"; then add "(i) the adopted snail is drawn" PASS "shell row in the pane"; else add "(i) the adopted snail is drawn" FAIL "no snail row in the pane"; fi
+out=$(command_out "/buddy use default"); sleep 3
+if shows_any "$RUN/professor.rows"; then add "(i) /buddy use default leaves it" PASS "$out"; else add "(i) /buddy use default leaves it" FAIL "$out"; fi
 
 cp "$(transcript)" "$RUN/main.jsonl"
 echo
