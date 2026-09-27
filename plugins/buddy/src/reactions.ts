@@ -3,8 +3,8 @@ import type { LineEvent, Pose } from './character.ts';
 // What a finished tool call means to the buddy: a table from outcome to pose,
 // line pool and effect, so a new reaction is a row, not a branch.
 
-export const TEST_PASS = /\b[1-9]\d* (passed|passing)\b|^ok\s+\S+|\bPASS\b|Tests?:\s+[1-9]\d* passed/m;
-export const TEST_FAIL = /\b[1-9]\d* (failed|failing)\b|^FAIL\b|^--- FAIL|\bFAILED\b/m;
+export const TEST_PASS = /\b[1-9]\d* (passed|passing)\b|^ok\s+\S+|\bPASS\b|Tests?:\s+[1-9]\d* passed|\b[1-9]\d* examples?, 0 failures?\b/m;
+export const TEST_FAIL = /\b[1-9]\d* (failed|failing)\b|^FAIL\b|^--- FAIL|\bFAILED\b|\b[1-9]\d* examples?, [1-9]\d* failures?\b/m;
 
 export type Outcome = 'toolFail' | 'testPass' | 'testFail';
 export type Reaction = { pose: Pose; line: LineEvent; confetti: boolean };

@@ -4,10 +4,10 @@ import { REACTIONS, TEST_FAIL, TEST_PASS, bashCommand, classifyToolCall, toolOut
 const bash = (output: string, isError = false) => ({ tool: 'Bash', isError, denied: false, output });
 
 describe('the test patterns', () => {
-  test.each(['12 passed', '3 passing', 'ok  \tgithub.com/x/y\t0.2s', 'PASS src/a.test.ts', 'Tests: 5 passed, 5 total', 'Test: 1 passed'])('pass: %s', (s) => {
+  test.each(['12 passed', '3 passing', 'ok  \tgithub.com/x/y\t0.2s', 'PASS src/a.test.ts', 'Tests: 5 passed, 5 total', 'Test: 1 passed', '12 examples, 0 failures'])('pass: %s', (s) => {
     expect(TEST_PASS.test(s)).toBe(true);
   });
-  test.each(['2 failed', '1 failing', 'FAIL src/a.test.ts', '--- FAIL: TestX', 'FAILED tests/test_a.py::t'])('fail: %s', (s) => {
+  test.each(['2 failed', '1 failing', 'FAIL src/a.test.ts', '--- FAIL: TestX', 'FAILED tests/test_a.py::t', '12 examples, 2 failures'])('fail: %s', (s) => {
     expect(TEST_FAIL.test(s)).toBe(true);
   });
   test.each(['3 passed; 0 failed', 'test result: ok. 3 passed; 0 failed; 0 ignored', '10 passed, 0 failing'])('a zero count is not a fail: %s', (s) => {
