@@ -4,7 +4,7 @@ import { REACTIONS, TEST_FAIL, TEST_PASS, bashCommand, classifyToolCall, toolOut
 const bash = (output: string, isError = false) => ({ tool: 'Bash', isError, denied: false, output });
 
 describe('the test patterns', () => {
-  test.each(['12 passed', '3 passing', 'ok  \tgithub.com/x/y\t0.2s', 'PASS src/a.test.ts', 'Tests: 5 passed, 5 total', 'Test: 1 passed'])('pass: %s', (s) => {
+  test.each(['12 passed', '3 passing', 'ok  \tgithub.com/x/y\t0.2s', 'PASS src/a.test.ts', 'Tests: 5 passed, 5 total', 'Test: 1 passed', 'Ran 5 tests in 0.01s\n\nOK'])('pass: %s', (s) => {
     expect(TEST_PASS.test(s)).toBe(true);
   });
   test.each(['2 failed', '1 failing', 'FAIL src/a.test.ts', '--- FAIL: TestX', 'FAILED tests/test_a.py::t'])('fail: %s', (s) => {
@@ -16,7 +16,7 @@ describe('the test patterns', () => {
   test.each(['0 passing', 'Tests: 0 passed, 0 total'])('a zero count is not a pass: %s', (s) => {
     expect(TEST_PASS.test(s)).toBe(false);
   });
-  test.each(['passed the salt', 'PASSWORD', 'notok x', 'failed to connect', 'a FAILURE'])('neither: %s', (s) => {
+  test.each(['passed the salt', 'PASSWORD', 'notok x', 'failed to connect', 'a FAILURE', 'OK', 'Ran 5 tests in 0.01s'])('neither: %s', (s) => {
     expect(TEST_PASS.test(s)).toBe(false);
     expect(TEST_FAIL.test(s)).toBe(false);
   });
