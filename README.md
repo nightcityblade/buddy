@@ -2,57 +2,77 @@
 
 # buddy
 
-**A tiny companion that walks on your Claude Code prompt line and talks back: Quack the duck by default, five more characters built in, or your own.**
+**Claude Code buddy plugin: Quack the ASCII duck waddles above your prompt and talks back — or bring back your /buddy**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![Version](https://img.shields.io/badge/version-0.2.0-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.1-blue)](./CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![CI](https://github.com/rezzminator/buddy/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/rezzminator/buddy/actions/workflows/ci.yml)
 [![Built with Professor](https://img.shields.io/badge/built%20with-Professor-8A2BE2)](https://github.com/rezzminator/professor)
 
+[Quick start](#-quick-start) · [Characters](#-characters) · [Docs](docs/design/_index.md) · [Changelog](./CHANGELOG.md) · [Help](#-help)
+
 </div>
 
+Meet **Quack**, a sarcastic little duck with a sharp tongue, waddling through
+your code with smug confidence. It lives on the line right above your Claude
+Code prompt:
+
 ```text
-   _A_           _A_           _A_    ╭────────────────────────╮
-  (o.o)         (o.o)c        (^.^)   │ Oh, this one's *nice*. │
-  /|_|\c        /|_|\         \|_|/c  ╰────────────────────────╯
-   / \           | |           | |
-  walking       a sip         tests pass
+    .-.            *  .-.           ╭───────────────────────────────────╮
+\__( x)=          \__( x)=          │ QUACK! All green, like pond weed. │
+ \____)            \_\/_)           ╰───────────────────────────────────╯
+ L   L              L  L
+walking           tests pass
+
+    .-.  Z            .-. !         ╭─────────────────────────────────────────────╮
+\__( -)=          \__( x)<          │ That one splashed. Let's dry off and retry. │
+ \____)            \____)           ╰─────────────────────────────────────────────╯
+~~~~~~~~            L  L
+after midnight    a tool fails
 ```
+
+Every line in those bubbles is one of Quack's own; its art and its lines live
+in [`plugins/buddy/characters/duck.json`](./plugins/buddy/characters/duck.json).
 
 ---
 
-In April 2026 Claude Code shipped `/buddy`, an April Fools companion that
-sat beside the prompt and commented on your work in a speech bubble.
-Version 2.1.97 removed it on April 9, and the server that wrote its
-reactions went quiet the next day.
+## 🦆 Why buddy
+
+Claude Code once shipped `/buddy`, a companion that sat beside the prompt
+and commented on your work in a speech bubble. It worked up to version
+2.1.96; version 2.1.97 removed it.
 
 **buddy** brings a companion back as a plugin. It lives inside Claude Code's
 own interface, on the line right above the prompt, sees every tool call as it
-happens, and answers you through Claude Code's own model calls: there is no
-buddy server to go quiet.
+happens, and answers you through Claude Code's own model calls: it needs no
+server of its own.
 
-- 🚶 **Lives on your prompt line.** It walks back and forth above the prompt,
-  stops now and then to rest (Quack shakes out its feathers), stands
-  still while Claude works, and falls asleep after midnight.
-- 🎉 **Reacts to the work.** A failed or denied tool call gets an "oops"; a
-  test run passing in a Bash command gets a cheer and a burst of confetti; a
-  failing one gets an "oops" of its own.
-- 💬 **Talks back.** `/buddy why is this slow?` gets a one-line answer, in
-  character. By default the question forks this chat: the same model, the
-  whole conversation in view, served from its prompt cache.
+- 🚶 **A duck on your prompt line.** Quack walks back and forth above the
+  prompt, stops now and then to rest, stands still while Claude works, and
+  falls asleep after midnight.
+- 🎉 **Reacts to the work.** A test run passing in a Bash command gets a
+  cheer and a burst of confetti; a failing one, or a failed or denied tool
+  call, gets an "oops".
+- 💬 **Talks back, and remembers.** `/buddy why is this slow?` gets a
+  one-line answer, in character. By default the question forks this chat:
+  the same model, the whole conversation in view, served from its prompt
+  cache. It keeps your last few exchanges (the `memory` option) for its
+  next answer.
 - 🐣 **Your own buddy, back.** `/buddy-personality` opens a menu with a
   live preview; its "Yours" group recomputes the companion Claude Code
   hatched for your account (species, rarity, eyes, hat, stats) with the name
   and personality it saved.
-- 🎭 **Six characters, and yours.** Pick one in `/buddy-personality`, or draw
-  your own: a JSON file with a persona and a few poses of ASCII art.
 - 🤫 **Free unless you ask.** Walking, petting, switching and reactions never
   call a model. Only a question you ask, and quips if you turn them on,
   spend tokens.
 - 🛡️ **Never in the way.** A character that fails to load is replaced by the
   duck, who says why; a hook that fails logs the error and steps aside.
   `/buddy off` hides it, and it stays hidden across restarts.
+
+Quack is the default. buddy also ships the Professor, a cat, a robot, a
+ghost, a dragon and a yellow duck, and draws your own characters from a folder of JSON
+files (see [Characters](#-characters)).
 
 ## 🚀 Quick start
 
@@ -198,7 +218,7 @@ ignores options under any other key.
   "env": { "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1" },
   "pluginConfigs": {
     "buddy@buddy": {
-      "options": { "character": "robot", "characterDir": "/path/to/my-characters", "quips": true }
+      "options": { "characterDir": "/path/to/my-characters", "quips": true }
     }
   }
 }
@@ -295,8 +315,25 @@ where every decision is a pure, unit-tested module.
 
 buddy is built and maintained with [Professor](https://github.com/rezzminator/professor), a fleet controller and discipline layer for Claude Code, Codex and OpenCode: chats that message each other, agents held to the project's rules, and gated releases. The Professor character, shipped alongside Quack, carries its namesake.
 
-## License
+## 🆘 Help
 
-MIT
+- A question, or buddy not showing up: see the [FAQ](#-faq), then
+  [SUPPORT.md](./SUPPORT.md).
+- A bug or an idea: [open an issue](https://github.com/rezzminator/buddy/issues/new/choose);
+  there is a template for bugs, features and new characters.
+- A security problem: [SECURITY.md](./SECURITY.md), never a public issue.
+
+## 🤝 Contributing
+
+The best thing to add is a character: one JSON file, a persona and a few
+poses of ASCII art. [CONTRIBUTING.md](./CONTRIBUTING.md) walks through it;
+issues labelled
+[`good first issue`](https://github.com/rezzminator/buddy/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+are a place to start. Everyone taking part follows the
+[Code of Conduct](./CODE_OF_CONDUCT.md).
 
 <sub>Keywords: Claude Code buddy · /buddy · Claude Code companion · terminal pet · ASCII pet · tamagotchi · speech bubble · Claude Code plugin · function hooks · Claude Mods · custom characters</sub>
+
+## License
+
+[MIT](./LICENSE)

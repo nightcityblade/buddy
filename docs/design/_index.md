@@ -2,7 +2,7 @@
 
 buddy is a Claude Code function-hooks plugin that draws a small ASCII character on the line above the prompt.
 The character walks, rests, sleeps and reacts to tool calls and test runs, and it answers `/buddy` questions in one line through Claude Code's own model calls.
-Characters are JSON files, six shipped and any number of your own, and `/buddy-personality` can bring back the companion that Claude Code's removed `/buddy` hatched for your account.
+Characters are JSON files, seven shipped and any number of your own, and `/buddy-personality` can bring back the companion that Claude Code's removed `/buddy` hatched for your account.
 
 ## The designs
 
