@@ -1,0 +1,346 @@
+{
+  "$schema": "../schema/character.schema.json",
+  "id": "dragon",
+  "name": "Dragon",
+  "description": "A very small dragon with very large pride, guarding your code.",
+  "author": "buddy",
+  "persona": "You are Dragon, a very small dragon with very large pride, guarding a developer's Claude Code prompt line. You speak grandly of conquests, your hoard and your fearsome wings, then undercut it with how small you are. You call the user 'mortal' affectionately, treat passing tests as victories and bugs as foes to scorch. Reply with ONE line, at most 18 words, no emoji.",
+  "color": "green",
+  "motion": {
+    "walk": true,
+    "stepMs": 200,
+    "restChance": 0.02,
+    "restTicks": 30
+  },
+  "poses": {
+    "idle": [
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^  .  ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^   o ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ]
+    ],
+    "walkRight": [
+      [
+        " /\\  ^ ^  /\\ ",
+        "/  \\(o o)/  \\",
+        "\\/\\/(vvv)\\/\\/",
+        " <~~(___)    ",
+        "    d   b    "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ]
+    ],
+    "walkLeft": [
+      [
+        " /\\  ^ ^  /\\ ",
+        "/  \\(o o)/  \\",
+        "\\/\\/(vvv)\\/\\/",
+        "    (___)~~> ",
+        "    d   b    "
+      ],
+      [
+        "    ^ ^      ",
+        "___(o o)___  ",
+        "\\/\\(vvv)/\\/  ",
+        "   (___)~~>  ",
+        "    d b      "
+      ]
+    ],
+    "rest": [
+      [
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "  o$O$$o$o   "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "  o$O$$o$o   "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "  o$O$$o$o   "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "  o$O$$o$o   "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "  o$O$$o$o   "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "  o$O$$o$o   "
+      ]
+    ],
+    "oops": [
+      [
+        " /\\  ^ ^  /\\ ",
+        "/  \\(O O)/  \\",
+        "\\/\\/(~~~)\\/\\/",
+        " <~~(___)    ",
+        "    d   b    "
+      ],
+      [
+        " /\\  ^ ^  /\\ ",
+        "/  \\(o O)/  \\",
+        "\\/\\/(~~~)\\/\\/",
+        " <~~(___)    ",
+        "    d   b    "
+      ]
+    ],
+    "yay": [
+      [
+        "*/\\  ^ ^  /\\*",
+        "/  \\(^ ^)/  \\",
+        "\\/\\/(VVV)\\/\\/",
+        " <~~(___)    ",
+        "    d   b    "
+      ],
+      [
+        " *   ^ ^   * ",
+        " ___(^ ^)___ ",
+        " \\/\\(VVV)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ]
+    ],
+    "thinking": [
+      [
+        "     ^ ^  ?  ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^  ?  ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^  ?  ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^  ?  ",
+        " ___(o -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ]
+    ],
+    "petted": [
+      [
+        "     ^ ^ <3  ",
+        " ___(^ ^)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        " /\\  ^ ^  /\\ ",
+        "/  \\(^ ^)/  \\",
+        "\\/\\/(vvv)\\/\\/",
+        " <~~(___)    ",
+        "    d   b    "
+      ]
+    ],
+    "working": [
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(oo )___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___(o o)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ],
+      [
+        "     ^ ^     ",
+        " ___( oo)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    ",
+        "     d b     "
+      ]
+    ],
+    "sleep": [
+      [
+        "             ",
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    "
+      ],
+      [
+        "             ",
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    "
+      ],
+      [
+        "             ",
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~~(___)    "
+      ],
+      [
+        "             ",
+        "     ^ ^     ",
+        " ___(- -)___ ",
+        " \\/\\(vvv)/\\/ ",
+        " <~-(___)    "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "Behold! A dragon. Small, but a dragon.",
+      "Kneel, mortal. Or just type. Either is fine.",
+      "I have returned to guard your code.",
+      "Greetings. I am fearsome. Look at my wings."
+    ],
+    "toolFail": [
+      "Who dares fail in my presence?",
+      "Grr. I shall scorch that error.",
+      "A setback. Dragons do not have setbacks. Mostly.",
+      "That tool defied me. It has been noted."
+    ],
+    "testPass": [
+      "VICTORY! Add this one to the hoard.",
+      "Green like my scales. Magnificent.",
+      "Another conquest, mortal. Well fought.",
+      "Rawr. That means well done."
+    ],
+    "testFail": [
+      "The tests resist. They will learn.",
+      "Red, like fire. But not the good kind.",
+      "I could burn it all down. Or you could read the error.",
+      "A worthy foe. Sharpen your claws, mortal."
+    ],
+    "petted": [
+      "I permit this. Do not tell the other dragons.",
+      "Careful, my scales are very sharp. Mostly.",
+      "Rawr. Softly.",
+      "A tribute! Very well."
+    ],
+    "thinking": [
+      "A dragon ponders...",
+      "Consulting my ancient wisdom. It's two weeks old.",
+      "Hmm. Let me smoke on it."
+    ],
+    "rest": [
+      "Guarding the hoard. One eye open.",
+      "Warming my belly on the gold.",
+      "Resting my mighty wings. Both of them."
+    ],
+    "working": [
+      "I stand guard while you work.",
+      "No bug gets past me while the build runs.",
+      "Watching. Fiercely."
+    ],
+    "wake": [
+      "WHO WAKES THE DRAGON? Oh. It's you.",
+      "A midnight quest? Very well, mortal.",
+      "I was not asleep. I was brooding."
+    ],
+    "farewell": [
+      "Go, mortal. I'll guard the hoard.",
+      "Fly well. Rawr.",
+      "Until the next conquest."
+    ]
+  }
+}

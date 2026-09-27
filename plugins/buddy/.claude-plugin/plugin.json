@@ -1,0 +1,57 @@
+{
+  "name": "buddy",
+  "version": "0.1.0",
+  "description": "A tiny companion that walks on your Claude Code prompt line and talks back — the Professor by default, more characters built in, or your own.",
+  "license": "MIT",
+  "author": {
+    "name": "Reza · Professor",
+    "url": "https://github.com/rezzminator/professor"
+  },
+  "repository": "https://github.com/rezzminator/buddy",
+  "homepage": "https://github.com/rezzminator/buddy",
+  "keywords": ["claude-code", "claude-code-plugin", "function-hooks", "claude-mods", "professor", "buddy", "companion", "terminal-pet", "ascii"],
+  "userConfig": {
+    "character": {
+      "type": "string",
+      "title": "Character id (see /buddy list)",
+      "description": "The character drawn above the prompt; /buddy use {id} overrides it for this machine, /buddy use default returns to it.",
+      "default": "professor"
+    },
+    "characterDir": {
+      "type": "directory",
+      "title": "Folder of your own character JSON files",
+      "description": "Each {id}.json in it is a character (see the plugin's schema/character.schema.json); an id shared with a built-in replaces the built-in. Empty: built-ins only.",
+      "default": ""
+    },
+    "motion": {
+      "type": "boolean",
+      "title": "Walk along the prompt line",
+      "description": "Off: the character stands still and only animates in place.",
+      "default": true
+    },
+    "questionMode": {
+      "type": "string",
+      "title": "/buddy questions: fork (sees the chat, uses its cache), complete, or off",
+      "description": "fork: answers from a fork of this chat (same model, served from its prompt cache); complete: a fresh call on quipModel that does not see the chat; off: no model call.",
+      "default": "fork"
+    },
+    "quips": {
+      "type": "boolean",
+      "title": "Model-written one-liners at the end of a turn (spends tokens)",
+      "description": "At the end of a turn that used a tool, one short call on quipModel for a one-line reaction.",
+      "default": false
+    },
+    "quipModel": {
+      "type": "string",
+      "title": "Model for quips and fresh-session answers",
+      "description": "An alias (haiku, sonnet) or a full model id.",
+      "default": "haiku"
+    },
+    "quipCooldownSec": {
+      "type": "number",
+      "title": "Minimum seconds between quips",
+      "description": "A quip waits at least this long after the previous one.",
+      "default": 45
+    }
+  }
+}

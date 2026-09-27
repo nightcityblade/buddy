@@ -1,0 +1,180 @@
+# Contributing
+
+The best thing to add to buddy is a character. A character is one JSON file:
+a persona, a few poses of ASCII art and, if you like, some lines to say. You
+can build and try one in a folder of your own, without touching this
+repository, and then send it in to ship with buddy.
+
+## The character file
+
+One JSON object per file, `{id}.json`, the file name equal to `id`. The
+contract is [`plugins/buddy/schema/character.schema.json`](./plugins/buddy/schema/character.schema.json)
+(JSON Schema, draft 2020-12); a field, pose or line event it does not name
+makes the file invalid.
+
+| Field | Type | Req | Meaning |
+| --- | --- | --- | --- |
+| `$schema` | string | no | `"../schema/character.schema.json"` in built-ins |
+| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; `/buddy use {id}` |
+| `name` | string ≤ 40 | yes | display name |
+| `description` | string ≤ 100 | yes | one line for `/buddy list` |
+| `author` | string ≤ 60 | no | credit |
+| `persona` | string ≤ 1200 | yes | the character's voice prompt, 2nd person ("You are …") |
+| `color` | Ink color name or `#rrggbb` | no | sprite color, default `"yellow"` |
+| `poses` | object | yes | pose name → array of frames; frame = array of rows (strings) |
+| `lines` | object | no | event name → array of canned one-liners (≤ 120 chars each) |
+| `motion` | object | no | `walk` (bool, default true), `stepMs` (80–1000, default 200), `restChance` (0–0.2, default 0.02), `restTicks` (1–100, default 15) |
+
+The Ink color names are `black`, `red`, `green`, `yellow`, `blue`,
+`magenta`, `cyan`, `white`, `gray` (or `grey`), and each of the first eight
+with `Bright` appended (`cyanBright`).
+
+### Poses
+
+A pose is an array of frames; the frames alternate each tick, and a pose
+with a single frame is static. A pose you leave out falls back to another:
+
+| Pose | Required | Falls back to | Drawn when |
+| --- | --- | --- | --- |
+| `idle` | yes, ≥ 1 frame | | standing still |
+| `walkRight` | when `motion.walk` is true (the default), ≥ 2 frames | | walking right: the leg cycle |
+| `walkLeft` | no | `walkRight` | walking left |
+| `rest` | no | `idle` | a pause in the walk (the Professor sips his tea) |
+| `oops` | no | `idle` | a tool call failed, or a test run failed |
+| `yay` | no | `idle` | a test run passed |
+| `thinking` | no | `idle` | a question is being answered |
+| `petted` | no | `yay` | `/buddy` |
+| `working` | no | `idle` | Claude is working; the character stands still, reading a book for instance |
+| `sleep` | no | `rest` | midnight to 6 am, after a minute with nothing happening; a `z Z` drifts above it |
+
+### The art
+
+- Rows are printable ASCII only (0x20 to 0x7E): no tabs, no emoji, no wide
+  or other Unicode characters, because alignment is counted per cell.
+- A frame is at most 16 columns wide and 6 rows tall.
+- Rows need no padding: the engine pads every row to the character's
+  widest row and aligns shorter frames at the bottom, so the feet stay on
+  the line.
+- In JSON a backslash is written `"\\"`: the row `\o/` is `"\\o/"`.
+
+### Lines
+
+`lines` maps an event to a pool of one-liners, each at most 120
+characters. A line never repeats twice in a row within its pool. A pool you
+leave out falls back to a short, neutral pool of the engine's (`wake` first
+borrows your `greeting`); no character ever speaks in another character's
+voice.
+
+| Event | Said when |
+| --- | --- |
+| `greeting` | the session starts, or after `/buddy use {id}`, `/buddy use default`, `/buddy reload` and `/buddy on` |
+| `toolFail` | a tool call failed or was denied |
+| `testPass` | a Bash command's output reads like a test pass |
+| `testFail` | a Bash command's output reads like a test failure |
+| `petted` | you type `/buddy` |
+| `thinking` | it starts on a question you asked |
+| `rest` | one walking rest in four, for 6 seconds, beside the `rest` pose |
+| `working` | Claude starts working and no bubble is showing: one time in four, for 6 seconds |
+| `wake` | any event (a tool call, `/buddy`, a turn ending, work starting) wakes it from `sleep` |
+| `farewell` | `/buddy off`: printed as the command's reply, since the band hides at once |
+
+### Persona
+
+`persona` is the prompt a model answers in when you ask a question (and for
+quips, when they are on). Write it in the second person ("You are …"): who
+the character is, how it talks, a phrase or two it likes. The engine adds
+the rule that answers are one line, so the persona does not need to.
+
+### Motion
+
+`motion` is optional. `walk: false` keeps the character standing on its
+`idle` frames, and then `walkRight` is not required. `stepMs` is the time
+per step, `restChance` the chance per step of stopping to rest, and
+`restTicks` how many steps a rest lasts.
+
+## A minimal example
+
+A blob that wobbles along, cheers when tests pass, and has a few lines of
+its own:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/rezzminator/buddy/main/plugins/buddy/schema/character.schema.json",
+  "id": "blob",
+  "name": "Blob",
+  "description": "A small, cheerful blob that wobbles along your prompt.",
+  "author": "you",
+  "persona": "You are Blob, a small cheerful blob who lives above a developer's Claude Code prompt. You speak in short, happy sentences, you are easily impressed, and you never give up on a failing test.",
+  "color": "cyan",
+  "poses": {
+    "idle": [[" .--. ", "( oo )", " `--' "]],
+    "walkRight": [
+      [" .--. ", "( oo )", " `--' "],
+      [" .--. ", "( oo )", " '--` "]
+    ],
+    "yay": [["\\.--./", "( ^^ )", " `--' "]]
+  },
+  "lines": {
+    "greeting": ["Blob is here!", "Hello again, friend."],
+    "testPass": ["Green! Wobble wobble.", "All passing. Blob is proud."],
+    "toolFail": ["Oof. Try again?", "That one did not go well."]
+  }
+}
+```
+
+Every pose it leaves out falls back as the table above says: `oops`,
+`thinking` and `working` draw `idle`, and `petted` draws `yay`.
+
+## Try it locally
+
+1. Save the file in a folder of your own, for example
+   `my-characters/blob.json`.
+2. Point the `characterDir` option at that folder: through `/config`, or in
+   `settings.json` under `pluginConfigs["buddy@buddy"].options.characterDir`.
+   Start a new session.
+3. `/buddy list` shows `blob (yours)`, or `INVALID: {error}` with the first
+   thing wrong in the file.
+4. `/buddy use blob` draws it.
+5. Edit the file, save, and run `/buddy reload` to see the change. Try a
+   narrow window as well as a wide one.
+6. `/buddy use default` goes back to your usual character.
+
+An editor that reads `$schema` checks the file as you type. Inside this
+repository, the built-ins use the relative path
+`"../schema/character.schema.json"` instead of the URL.
+
+## Send it in
+
+1. Fork this repository and branch off `develop`.
+2. Add `plugins/buddy/characters/{id}.json`, with
+   `"$schema": "../schema/character.schema.json"` and your `author`, and a
+   row for it in the Characters table of `README.md`.
+3. Run the checks:
+
+   ```sh
+   npm install
+   export CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1
+   npm test
+   npm run validate:plugin
+   ```
+
+4. Try it in a real session: `claude --plugin-dir plugins/buddy`, then
+   `/buddy use {id}`.
+5. Open a pull request against `develop`, with each pose pasted in a text
+   block.
+
+A character ships when:
+
+- the art and the persona are your own work, not a copy of an existing
+  character, a trademark or a real person;
+- its lines and persona are friendly: it is a companion, not a critic;
+- it is new: not a recolour or a near copy of one already built in;
+- you agree to license it under the repository's MIT license.
+
+## Code
+
+A change to the engine lands in `plugins/buddy/src/` as a pure function with
+a test in `tests/` that you watched fail first; `plugins/buddy/hooks/buddy.tsx`
+only wires it to Claude Code. `npm test`, `npm run typecheck` and
+`npm run validate:plugin` pass before a pull request, and the pull request
+goes to `develop`.

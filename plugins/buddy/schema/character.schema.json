@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rezzminator/buddy/plugins/buddy/schema/character.schema.json",
+  "title": "buddy character",
+  "description": "One character of the buddy Claude Code plugin: characters/{id}.json, the file name equal to id.",
+  "type": "object",
+  "required": ["id", "name", "description", "persona", "poses"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$", "description": "Unique; /buddy use {id}. Equal to the file name." },
+    "name": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Display name." },
+    "description": { "type": "string", "minLength": 1, "maxLength": 100, "description": "One line for /buddy list." },
+    "author": { "type": "string", "maxLength": 60, "description": "Credit." },
+    "persona": { "type": "string", "minLength": 1, "maxLength": 1200, "description": "The character's voice prompt, second person (\"You are ...\")." },
+    "color": {
+      "description": "Sprite color: an Ink color name or #rrggbb. Default yellow.",
+      "anyOf": [
+        { "enum": ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "gray", "grey", "blackBright", "redBright", "greenBright", "yellowBright", "blueBright", "magentaBright", "cyanBright", "whiteBright"] },
+        { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }
+      ]
+    },
+    "poses": {
+      "type": "object",
+      "description": "Pose name to frames; frames alternate each tick, a single frame is static.",
+      "required": ["idle"],
+      "additionalProperties": false,
+      "properties": {
+        "idle": { "$ref": "#/$defs/frames" },
+        "walkRight": { "$ref": "#/$defs/walkFrames" },
+        "walkLeft": { "$ref": "#/$defs/frames" },
+        "rest": { "$ref": "#/$defs/frames" },
+        "oops": { "$ref": "#/$defs/frames" },
+        "yay": { "$ref": "#/$defs/frames" },
+        "thinking": { "$ref": "#/$defs/frames" },
+        "petted": { "$ref": "#/$defs/frames" },
+        "working": { "$ref": "#/$defs/frames" },
+        "sleep": { "$ref": "#/$defs/frames" }
+      }
+    },
+    "lines": {
+      "type": "object",
+      "description": "Event name to canned one-liners; a missing pool falls back to a neutral generic pool.",
+      "additionalProperties": false,
+      "properties": {
+        "greeting": { "$ref": "#/$defs/pool" },
+        "toolFail": { "$ref": "#/$defs/pool" },
+        "testPass": { "$ref": "#/$defs/pool" },
+        "testFail": { "$ref": "#/$defs/pool" },
+        "petted": { "$ref": "#/$defs/pool" },
+        "thinking": { "$ref": "#/$defs/pool" },
+        "rest": { "$ref": "#/$defs/pool" },
+        "working": { "$ref": "#/$defs/pool" },
+        "wake": { "$ref": "#/$defs/pool" },
+        "farewell": { "$ref": "#/$defs/pool" }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "walk": { "type": "boolean", "default": true, "description": "True requires poses.walkRight with at least 2 frames." },
+        "stepMs": { "type": "integer", "minimum": 80, "maximum": 1000, "default": 200 },
+        "restChance": { "type": "number", "minimum": 0, "maximum": 0.2, "default": 0.02 },
+        "restTicks": { "type": "integer", "minimum": 1, "maximum": 100, "default": 15 }
+      }
+    }
+  },
+  "if": {
+    "anyOf": [
+      { "not": { "required": ["motion"] } },
+      { "properties": { "motion": { "not": { "required": ["walk"] } } } },
+      { "properties": { "motion": { "properties": { "walk": { "const": true } } } } }
+    ]
+  },
+  "then": { "properties": { "poses": { "required": ["walkRight"] } } },
+  "$defs": {
+    "row": { "type": "string", "maxLength": 16, "pattern": "^[\\x20-\\x7E]*$", "description": "Printable ASCII only, at most 16 columns." },
+    "frame": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "$ref": "#/$defs/row" }, "description": "Rows of one frame, at most 6." },
+    "frames": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/frame" } },
+    "walkFrames": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/frame" }, "description": "The leg cycle: at least 2 frames." },
+    "pool": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1, "maxLength": 120 } }
+  }
+}

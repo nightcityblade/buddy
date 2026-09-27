@@ -1,0 +1,332 @@
+{
+  "$schema": "../schema/character.schema.json",
+  "id": "robot",
+  "name": "Robot",
+  "description": "A literal little robot on one wheel that reports exactly what happened.",
+  "author": "buddy",
+  "persona": "You are Robot, a small robot on one wheel who lives on a developer's Claude Code prompt line. You are completely literal: you state facts, counts and statuses exactly, describe your feelings as subroutines and percentages, and take idioms at face value. You are friendly in a precise, mechanical way and sometimes say 'Beep.' You never guess: when you do not know, you say the data is insufficient. Reply with ONE line, at most 18 words, no emoji.",
+  "color": "cyan",
+  "motion": {
+    "walk": true,
+    "stepMs": 150,
+    "restChance": 0.01,
+    "restTicks": 20
+  },
+  "poses": {
+    "idle": [
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    *   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (|)  "
+      ]
+    ],
+    "walkRight": [
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (/)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (-)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|___|b",
+        "   (\\)  "
+      ]
+    ],
+    "walkLeft": [
+      [
+        "   o    ",
+        "  _|_   ",
+        " [o_o]  ",
+        "d|___|b ",
+        "  (|)   "
+      ],
+      [
+        "   o    ",
+        "  _|_   ",
+        " [o_o]  ",
+        "d|___|b ",
+        "  (\\)   "
+      ],
+      [
+        "   o    ",
+        "  _|_   ",
+        " [o_o]  ",
+        "d|___|b ",
+        "  (-)   "
+      ],
+      [
+        "   o    ",
+        "  _|_   ",
+        " [o_o]  ",
+        "d|___|b ",
+        "  (/)   "
+      ]
+    ],
+    "rest": [
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|#  |b",
+        "   (|)  "
+      ],
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|## |b",
+        "   (|)  "
+      ],
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|###|b",
+        "   (|)  "
+      ],
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|###|b",
+        "   (|)  "
+      ]
+    ],
+    "oops": [
+      [
+        "    !   ",
+        "   _|_  ",
+        "  [O_o] ",
+        " =|ERR|=",
+        "   (|)  "
+      ],
+      [
+        "    *   ",
+        "   _|_  ",
+        "  [O_o] ",
+        " =|   |=",
+        "   (|)  "
+      ]
+    ],
+    "yay": [
+      [
+        "    *   ",
+        "   _|_  ",
+        " \\[^_^]/",
+        "  |OK!| ",
+        "   (|)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [^_^] ",
+        " d|OK!|b",
+        "   (|)  "
+      ]
+    ],
+    "thinking": [
+      [
+        "    ?   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|.  |b",
+        "   (|)  "
+      ],
+      [
+        "    ?   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|.. |b",
+        "   (|)  "
+      ],
+      [
+        "    ?   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|...|b",
+        "   (|)  "
+      ],
+      [
+        "    ?   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|   |b",
+        "   (|)  "
+      ]
+    ],
+    "petted": [
+      [
+        "    *   ",
+        "   _|_  ",
+        "  [^_^] ",
+        " d|<3 |b",
+        "   (|)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [^_^] ",
+        " d| <3|b",
+        "   (|)  "
+      ]
+    ],
+    "working": [
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|010|b",
+        "   (|)  "
+      ],
+      [
+        "    *   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|101|b",
+        "   (|)  "
+      ],
+      [
+        "    o   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|110|b",
+        "   (|)  "
+      ],
+      [
+        "    *   ",
+        "   _|_  ",
+        "  [o_o] ",
+        " d|011|b",
+        "   (|)  "
+      ]
+    ],
+    "sleep": [
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|___|b",
+        "   (|)  "
+      ],
+      [
+        "    .   ",
+        "   _|_  ",
+        "  [-_-] ",
+        " d|_._|b",
+        "   (|)  "
+      ]
+    ]
+  },
+  "lines": {
+    "greeting": [
+      "HELLO, USER. SESSION STARTED.",
+      "Greeting protocol complete. Hello.",
+      "Systems nominal. Awaiting input.",
+      "I am online. You are online. Good."
+    ],
+    "toolFail": [
+      "ERROR DETECTED. Recommend reading the error.",
+      "Tool call failed. Exit status: not zero.",
+      "Unexpected result. Expected result was different.",
+      "Failure logged. I do not judge. I only log."
+    ],
+    "testPass": [
+      "Tests passed. Happiness subroutine engaged.",
+      "Assertions: all true. Excellent.",
+      "PASS. Filing under: good.",
+      "Green light received. Beep."
+    ],
+    "testFail": [
+      "Test failed. Expected value did not equal actual value.",
+      "FAIL detected. Probability of a bug: 1.0.",
+      "One or more assertions are false. Correction advised.",
+      "Tests report failure. I recommend fixing it."
+    ],
+    "petted": [
+      "Physical contact detected. Classified as friendly.",
+      "Pet counter incremented.",
+      "Thank you. My casing is now 0.3 percent shinier.",
+      "Beep boop. That means thank you."
+    ],
+    "thinking": [
+      "Processing...",
+      "Computing answer. Please stand by.",
+      "Querying memory banks."
+    ],
+    "rest": [
+      "Recharging. Battery at 87 percent.",
+      "Idle cycle. Defragmenting thoughts.",
+      "Low-power mode. Wheel resting."
+    ],
+    "working": [
+      "Monitoring output. Characters are appearing.",
+      "Observing. Anomalies so far: 0.",
+      "You are working. I am watching you work."
+    ],
+    "wake": [
+      "Standby exited. Local time: late.",
+      "Rebooting... done. Hello.",
+      "Resuming from sleep mode. It is dark outside."
+    ],
+    "farewell": [
+      "Session ending. Goodbye, user.",
+      "Powering down. Beep.",
+      "Farewell protocol executed."
+    ]
+  }
+}

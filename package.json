@@ -1,0 +1,26 @@
+{
+  "name": "buddy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A tiny companion that walks on your Claude Code prompt line and talks back — the Professor by default, more characters built in, or your own.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "vitest run --dir tests && claude plugin test plugins/buddy",
+    "test:unit": "vitest run --dir tests",
+    "test:hooks": "claude plugin test plugins/buddy",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.hooks.json",
+    "validate:plugin": "claude plugin validate --strict . && claude plugin validate --strict plugins/buddy",
+    "release:check": "scripts/release-check.sh",
+    "live": "scripts/live-proof.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  },
+  "keywords": ["claude-code", "claude-code-plugin", "function-hooks", "claude-mods", "professor", "buddy", "companion", "terminal-pet", "ascii"]
+}
