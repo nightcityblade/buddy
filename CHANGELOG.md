@@ -4,6 +4,15 @@ Every release of buddy. Versions follow [semantic versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-27
+
+### Added
+- Yellow Duck (`yellow-duck`): the bright yellow duck of 0.1.0, kept as a character of its own now that Quack is the default duck.
+- Community files: CODE_OF_CONDUCT, SECURITY, SUPPORT, issue and pull request templates, and a social preview.
+
+### Changed
+- The README leads with Quack the duck: a demo of its real frames and lines, why buddy, help and contributing.
+
 ## [0.2.0] — 2026-09-27
 
 ### Added
