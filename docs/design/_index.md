@@ -48,7 +48,7 @@ flowchart LR
 | --- | --- |
 | Only the adapter touches `$`, passes it only to its top-level functions, and spells every call `$.noun.event(...)` | otherwise Claude Code loads the module with zero hooks; `npm run validate:plugin` reports it |
 | Every hook catches, logs `buddy: {what} failed: {err}` with `$.ui.log`, and returns `next(e)` or the original result | a broken buddy never blocks the prompt of everyone who installed it |
-| An error never looks like "no buddy" | a bad character draws the Professor with a bubble naming why; the menu says why inside the group |
+| An error never looks like "no buddy" | a bad character draws the duck with a bubble naming why; the menu says why inside the group |
 | Only a question, or a quip when quips are on, calls a model | walking, reactions, petting and every other command stay local and free |
 
 ## What persists
@@ -57,7 +57,7 @@ flowchart LR
 
 | Key | Holds | Written by |
 | --- | --- | --- |
-| `character` | the chosen character id | `/buddy use {id}` and Enter in the menu; `/buddy use default` deletes it |
+| `character` | the chosen character id | Enter in `/buddy-personality`; picking the `character` option's own entry stores that id |
 | `hidden` | `true` while hidden | `/buddy off`, `/buddy on` |
 | `pets` | the pet count | `/buddy` |
 | `original` | the picked original's roll (`native` or `npm`) and its soul | Enter on a "Yours" row in the menu |

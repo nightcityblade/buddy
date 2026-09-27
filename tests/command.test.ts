@@ -5,25 +5,20 @@ describe('parseCommand', () => {
   test.each([
     ['', { kind: 'pet' }],
     ['   ', { kind: 'pet' }],
-    ['list', { kind: 'list' }],
-    ['LIST', { kind: 'list' }],
+    ['OFF', { kind: 'off' }],
     ['off', { kind: 'off' }],
     ['on', { kind: 'on' }],
     ['reload', { kind: 'reload' }],
     ['help', { kind: 'help' }],
-    ['use cat', { kind: 'use', id: 'cat' }],
-    ['use  Cat ', { kind: 'use', id: 'cat' }],
-    ['use default', { kind: 'useDefault' }],
+    ['use cat', { kind: 'question', text: 'use cat' }],
     ['list the files', { kind: 'question', text: 'list the files' }],
     ['use the force', { kind: 'question', text: 'use the force' }],
     ['what is a monad?', { kind: 'question', text: 'what is a monad?' }],
   ])('%j', (args, action) => {
     expect(parseCommand(args)).toEqual(action);
   });
-  test('use alone asks for an id', () => {
-    expect(parseCommand('use')).toEqual({ kind: 'usage', message: expect.stringMatching(/^usage: \/buddy use \{id\}/) });
-  });
-  test('the usage names every command', () => {
-    for (const word of ['list', 'use {id}', 'off', 'on', 'reload', 'help', '{question}', '/buddy-personality']) expect(USAGE).toContain(word);
+  test('the usage names every command, and switching lives in the menu', () => {
+    expect(USAGE).not.toMatch(/\/buddy (list|use)\b/);
+    for (const word of ['off', 'on', 'reload', 'help', '{question}', '/buddy-personality']) expect(USAGE).toContain(word);
   });
 });

@@ -14,7 +14,7 @@
         "path": "plugins/buddy",
         "ref": "main"
       },
-      "description": "A tiny companion that walks on your Claude Code prompt line and talks back — the Professor by default, more characters built in, or your own.",
+      "description": "A tiny companion that walks on your Claude Code prompt line and talks back — Quack the duck by default, more characters built in, or your own.",
       "version": "0.2.0",
       "license": "MIT",
       "keywords": ["claude-code", "claude-code-plugin", "function-hooks", "claude-mods", "professor", "buddy", "companion", "terminal-pet", "ascii"],

@@ -20,7 +20,7 @@ export type Options = {
 };
 
 export const DEFAULTS: Omit<Options, 'errors'> = {
-  character: 'professor',
+  character: 'duck',
   characterDir: '',
   motion: true,
   questionMode: 'fork',

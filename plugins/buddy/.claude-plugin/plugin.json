@@ -1,7 +1,7 @@
 {
   "name": "buddy",
   "version": "0.2.0",
-  "description": "A tiny companion that walks on your Claude Code prompt line and talks back — the Professor by default, more characters built in, or your own.",
+  "description": "A tiny companion that walks on your Claude Code prompt line and talks back — Quack the duck by default, more characters built in, or your own.",
   "license": "MIT",
   "author": {
     "name": "Reza · Professor",
@@ -13,9 +13,9 @@
   "userConfig": {
     "character": {
       "type": "string",
-      "title": "Character id (see /buddy list)",
-      "description": "The character drawn above the prompt; /buddy use {id} overrides it for this machine, /buddy use default returns to it.",
-      "default": "professor"
+      "title": "Character id (see /buddy-personality)",
+      "description": "The character drawn above the prompt; a pick in /buddy-personality overrides it for this machine, and picking this one there returns to it.",
+      "default": "duck"
     },
     "characterDir": {
       "type": "directory",

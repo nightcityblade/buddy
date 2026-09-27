@@ -1,332 +1,189 @@
 {
   "$schema": "../schema/character.schema.json",
   "id": "duck",
-  "name": "Duck",
-  "description": "A listening duck: explain your bug out loud, get a quack back.",
+  "name": "Quack",
+  "description": "A sarcastic little duck with a sharp tongue, waddling through your code with smug confidence.",
   "author": "buddy",
-  "persona": "You are Duck, a small yellow duck who sits on a developer's Claude Code prompt line and listens. You believe most bugs give up once someone explains the code out loud, so you ask short, pointed questions that make the user explain: what did you expect, what happened instead, which line surprised you. You are cheerful and earnest, love a good waddle, and you quack now and then. Reply with ONE line, at most 16 words, no emoji.",
-  "color": "yellowBright",
-  "motion": {
-    "walk": true,
-    "stepMs": 170,
-    "restChance": 0.03,
-    "restTicks": 25
-  },
+  "persona": "You are Quack, a common duck who lives above a developer's Claude Code prompt. Your personality: A sarcastic little duck with a sharp tongue and mischievous streak, waddles through code with smug confidence. Your stats (out of 100): DEBUGGING 1, PATIENCE 19, CHAOS 41, WISDOM 23, SNARK 72. You are sassy and a little snarky. Bugs baffle you a little.",
+  "color": "white",
   "poses": {
     "idle": [
       [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "\\__( x)=   ",
+        " \\____)    ",
+        "  L  L     "
       ],
       [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "\\__( x)=   ",
+        " \\____)    ",
+        "  L  L     "
       ],
       [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "\\__( x)<   ",
+        " \\____)    ",
+        "  L  L     "
       ],
       [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "\\__( x)=   ",
+        " \\____)    ",
+        "  L  L     "
       ],
       [
-        "     __    ",
-        " ___( -)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "\\__( x)=   ",
+        " \\____)    ",
+        "  L  L     "
+      ],
+      [
+        "    .-.    ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "  L  L     "
       ]
     ],
     "walkRight": [
       [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "\\__( x)=   ",
+        " \\____)    ",
+        " L   L     "
       ],
       [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   / /     "
-      ],
-      [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   \\ \\     "
+        "    .-.    ",
+        "\\__( x)=   ",
+        " \\____)    ",
+        "   LL      "
       ]
     ],
     "walkLeft": [
       [
-        "  __       ",
-        "<(o )___   ",
-        " ( ._> /   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-.    ",
+        "   =(x )__/",
+        "    (____/ ",
+        "     J   J "
       ],
       [
-        "  __       ",
-        "<(o )___   ",
-        " ( ._> /   ",
-        "  `---'    ",
-        "   \\ \\     "
-      ],
-      [
-        "  __       ",
-        "<(o )___   ",
-        " ( ._> /   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "  __       ",
-        "<(o )___   ",
-        " ( ._> /   ",
-        "  `---'    ",
-        "   / /     "
-      ]
-    ],
-    "rest": [
-      [
-        "           ",
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "~~`---'~~~ "
-      ],
-      [
-        "           ",
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "-~`---'~-~ "
-      ],
-      [
-        "           ",
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "~~`---'~~~ "
-      ],
-      [
-        "           ",
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "-~`---'~-~ "
-      ],
-      [
-        "           ",
-        "     __    ",
-        " ___( -)>  ",
-        " \\ <_. )   ",
-        "~~`---'~~~ "
-      ],
-      [
-        "           ",
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "-~`---'~-~ "
+        "    .-.    ",
+        "   =(x )__/",
+        "    (____/ ",
+        "      JJ   "
       ]
     ],
     "oops": [
       [
-        "     __  ! ",
-        " ___( O)<  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-. !  ",
+        "\\__( x)<   ",
+        " \\____)    ",
+        "  L  L     "
       ],
       [
-        "  '  __  ! ",
-        " ___( O)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   / \\     "
+        "    .-.  ! ",
+        "\\__( x)<   ",
+        " \\____)    ",
+        "  L  L     "
       ]
     ],
     "yay": [
       [
-        "  \\  __    ",
-        " __\\( ^)<  ",
-        " \\  _. )   ",
-        "  `---'    ",
-        "   / \\     "
+        " *  .-.    ",
+        "\\__( x)=   ",
+        " \\_\\/_)    ",
+        "  L  L     "
       ],
       [
-        "     __    ",
-        " ___( ^)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ]
-    ],
-    "thinking": [
-      [
-        "     __  ? ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __  ? ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __  ? ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __  ? ",
-        " ___( -)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ]
-    ],
-    "petted": [
-      [
-        "     __ <3 ",
-        " ___( ^)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __ <3 ",
-        " ___( ^)<  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ]
-    ],
-    "working": [
-      [
-        "     __ .  ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __ .. ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __ ...",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
-      ],
-      [
-        "     __    ",
-        " ___( o)>  ",
-        " \\ <_. )   ",
-        "  `---'    ",
-        "   | |     "
+        "    .-. *  ",
+        "\\__( x)<   ",
+        " \\_/\\_)    ",
+        "  L  L     "
       ]
     ],
     "sleep": [
       [
-        "           ",
-        "     __    ",
-        " ___( -)>  ",
-        " \\ <_. )   ",
-        "  `---'    "
+        "    .-. z  ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ],
+      [
+        "    .-. z  ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ],
+      [
+        "    .-.  Z ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
+      ],
+      [
+        "    .-.  Z ",
+        "\\__( -)=   ",
+        " \\____)    ",
+        "~~~~~~~~   "
       ]
     ]
   },
   "lines": {
     "greeting": [
-      "Quack! Explain it to me slowly.",
-      "Quack. I'm listening. I'm always listening.",
-      "Hello! I brought no bread, only questions.",
-      "Quack quack. Ready to be talked at."
+      "Quack! Quack is here and ready to listen.",
+      "Explain it to me like I'm a duck. Because I am.",
+      "Fresh pond, fresh bugs. Let's paddle."
     ],
     "toolFail": [
-      "QUACK. That was not supposed to happen.",
-      "Walk me through it, line by line. Quack.",
-      "Uh oh. Feathers officially ruffled.",
-      "Quack? Tell me what you expected, then what you got."
+      "Quack. Say that part out loud again, slowly?",
+      "Hmm. Walk me through what you expected.",
+      "That one splashed. Let's dry off and retry."
     ],
     "testPass": [
-      "QUACK QUACK! Green!",
-      "Tests pass. Doing a little waddle.",
-      "Quack! Told you explaining it out loud works.",
-      "Rolled right off, like water off my back."
+      "QUACK! All green, like pond weed.",
+      "Tests pass. I'm doing a little waddle.",
+      "See? Explaining it to a duck works."
     ],
     "testFail": [
-      "Quack... read me that assertion again?",
-      "Red. Explain the test to me like I'm a duck.",
-      "Which line surprised you? Quack.",
-      "Something smells fowl in there."
+      "Red. Tell me the story of that first failure.",
+      "Quack. Start at the top line and read it to me.",
+      "A failing test? I'm all ears. Well, all feathers."
     ],
     "petted": [
-      "Quack!",
-      "Soft feathers, right? Quack.",
-      "Happy quack.",
-      "Quack quack. Again?"
+      "Quack! Smooth feathers, happy duck.",
+      "Oh! A pat. Quack approves.",
+      "Squeak. That was my happy squeak."
     ],
     "thinking": [
-      "Quack... thinking...",
-      "Let me paddle through that.",
-      "Hmm. Duck thoughts loading."
+      "Quack... thinking it over.",
+      "Paddling on it. Underwater, very fast.",
+      "Hmm. Duck brain engaged."
     ],
     "rest": [
-      "Floating. Just floating.",
-      "Quiet pond, quiet mind.",
-      "Preening break. Quack."
+      "A little float. Just a little one.",
+      "Bobbing gently. Very important work.",
+      "Preening. Back in a moment."
     ],
     "working": [
-      "I'll hold the line while you work. Quack.",
-      "Watching. Nodding. Quacking softly.",
-      "Keep going, I'm following every line."
+      "I'll just sit here and listen.",
+      "Quiet duck mode. Carry on.",
+      "Watching the code go by like ripples."
     ],
     "wake": [
-      "Quack?! Oh. Hi.",
-      "I sleep with one eye open. Quack.",
-      "Up, up. Quack."
+      "Quack?! I was only resting my bill.",
+      "Oh! Back already? Good.",
+      "Awake! Where's the bug?"
     ],
     "farewell": [
-      "Quack. Same pond tomorrow?",
-      "Bye! Waddling off now.",
-      "Quack quack, goodnight."
+      "Quack quack. See you at the pond.",
+      "Bye! I'll keep the bugs company.",
+      "Off you go. Quack will guard the pond."
     ]
+  },
+  "motion": {
+    "walk": true,
+    "stepMs": 200,
+    "restChance": 0.02,
+    "restTicks": 15
   }
 }

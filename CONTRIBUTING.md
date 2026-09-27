@@ -15,9 +15,9 @@ makes the file invalid.
 | Field | Type | Req | Meaning |
 | --- | --- | --- | --- |
 | `$schema` | string | no | `"../schema/character.schema.json"` in built-ins |
-| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; `/buddy use {id}` |
+| `id` | string, `^[a-z0-9][a-z0-9-]{0,31}$` | yes | unique; the id `/buddy-personality` stores |
 | `name` | string ≤ 40 | yes | display name |
-| `description` | string ≤ 100 | yes | one line for `/buddy list` |
+| `description` | string ≤ 100 | yes | one line for the menu's preview and the hover card |
 | `author` | string ≤ 60 | no | credit |
 | `persona` | string ≤ 1200 | yes | the character's voice prompt, 2nd person ("You are …") |
 | `color` | Ink color name or `#rrggbb` | no | sprite color, default `"yellow"` |
@@ -39,7 +39,7 @@ with a single frame is static. A pose you leave out falls back to another:
 | `idle` | yes, ≥ 1 frame | | standing still |
 | `walkRight` | when `motion.walk` is true (the default), ≥ 2 frames | | walking right: the leg cycle |
 | `walkLeft` | no | `walkRight` | walking left |
-| `rest` | no | `idle` | a pause in the walk (the Professor sips his tea) |
+| `rest` | no | `idle` | a pause in the walk (Quack shakes out its feathers) |
 | `oops` | no | `idle` | a tool call failed, or a test run failed |
 | `yay` | no | `idle` | a test run passed |
 | `thinking` | no | `idle` | a question is being answered |
@@ -67,7 +67,7 @@ voice.
 
 | Event | Said when |
 | --- | --- |
-| `greeting` | the session starts, or after `/buddy use {id}`, `/buddy use default`, `/buddy reload` and `/buddy on` |
+| `greeting` | the session starts, or after Enter in `/buddy-personality`, `/buddy reload` and `/buddy on` |
 | `toolFail` | a tool call failed or was denied |
 | `testPass` | a Bash command's output reads like a test pass |
 | `testFail` | a Bash command's output reads like a test failure |
@@ -132,12 +132,12 @@ Every pose it leaves out falls back as the table above says: `oops`,
 2. Point the `characterDir` option at that folder: through `/config`, or in
    `settings.json` under `pluginConfigs["buddy@buddy"].options.characterDir`.
    Start a new session.
-3. `/buddy list` shows `blob (yours)`, or `INVALID: {error}` with the first
-   thing wrong in the file.
-4. `/buddy use blob` draws it.
+3. `/buddy-personality` lists it under Your folder, or as `blob (invalid)`
+   with the first thing wrong in the file in its preview.
+4. Enter on it draws it.
 5. Edit the file, save, and run `/buddy reload` to see the change. Try a
    narrow window as well as a wide one.
-6. `/buddy use default` goes back to your usual character.
+6. Pick your usual character in `/buddy-personality` to go back to it.
 
 An editor that reads `$schema` checks the file as you type. Inside this
 repository, the built-ins use the relative path
@@ -159,7 +159,7 @@ repository, the built-ins use the relative path
    ```
 
 4. Try it in a real session: `claude --plugin-dir plugins/buddy`, then
-   `/buddy use {id}`.
+   pick it in `/buddy-personality`.
 5. Open a pull request against `develop`, with each pose pasted in a text
    block.
 

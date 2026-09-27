@@ -54,7 +54,7 @@ A shipped id your folder overrides appears once, under Your folder.
 
 ## The live preview
 
-The right side shows the highlighted entry (`previewOf`): its `idle` animation in its color, its name, one line about it (the description `/buddy list` shows, or an original's saved personality; never the persona prompt), its first greeting in quotes, and for an original the card: species, stars, shiny, five stat bars and the hatch date.
+The right side shows the highlighted entry (`previewOf`): its `idle` animation in its color, its name, one line about it (the description, or an original's saved personality; never the persona prompt), its first greeting in quotes, and for an original the card: species, stars, shiny, five stat bars and the hatch date.
 
 The preview has its own clock: `$.clock.every(PREVIEW_MS)`, 500 ms, one frame per beat.
 It is separate from the band's clock, which stops while buddy is hidden and runs at the drawn character's period; the preview animates whatever you highlight, at one pace, hidden or not.
@@ -74,7 +74,7 @@ Enter on a "Yours" row with no soul behind it does the same.
 
 ## Persistence and restart
 
-Enter saves exactly what `/buddy use {id}` saves: the store's `character` key.
+Enter saves the store's `character` key; the menu is the only thing that writes it. Going back to the `character` option's character is a pick of its entry, which stores that id: the same character is drawn, and nothing clears the key.
 For an original it saves `character: "original"` and, under `original`, the roll and the soul, never the identity.
 The choice survives `/reload` and restarts; at a start with the original chosen, `restoreOriginal` rolls it again from the saved soul, with no backup scan.
 A save that fails still switches for this session and says so in the bubble: `{name} is here (not saved: {why})`, for 10 seconds.
@@ -102,7 +102,8 @@ Every failure to look is a line where the missing rows would be, and every entry
 - **A focused pane.** Rejected: a list printed as the command's reply. A preview needs a surface that redraws, and a focused pane takes the keys.
 - **A preview clock of its own.** Rejected: the band's clock, which stops while hidden and ticks at another character's pace.
 - **Only Enter switches.** Rejected: switching as the highlight moves. Browsing stays free, and Esc is a clean cancel.
-- **Enter remembers, as `/buddy use` does.** Rejected: a menu pick that lasts one session. One rule for both ways to choose.
+- **Enter remembers.** Rejected: a menu pick that lasts one session.
+- **The menu is the one way to see and switch.** Rejected: `/buddy list` and `/buddy use {id}` beside it. Two ways to choose drift apart; the menu shows everything the list did, with a preview.
 - **"Yours" read at every open.** Rejected: reading it once at start. A backup restored meanwhile shows at the next open, and a start never scans backups unless the original is chosen.
 - **Your additions live in a folder, never in `~/.claude.json`.** Rejected: storing characters or picks in that file. Claude Code rewrites it, so a key buddy added could be lost or race the engine's own write, and buddy treats it as read-only. Your characters live in `characterDir`, your picks in `$.store`.
 
@@ -119,4 +120,4 @@ Every failure to look is a line where the missing rows would be, and every entry
 - Unit: [`tests/menu.test.ts`](../../tests/menu.test.ts): the three groups, a failure to look as a line, the current row marked, the preview's frames, card and errors.
 - Hooks: the `/buddy-personality` group opens the focused pane, moves the preview with `ui.focus`, picks with a press (saved, closed, greeted), shows an original from an invented `~/.claude.json` or its newest backup, restores it at a restart, and turns every unreadable or invalid file into its line.
 - The testing kit cannot raise a person's Esc, so the hooks only check that the pane asks for `closeOnEscape`; the live proof presses the real key.
-- Live: the six (i) rows open the menu, move with Down, close with Esc, pick with Enter, and check `/buddy list` and `/buddy use default` after.
+- Live: the six (i) rows open the menu, move with Down, close with Esc, pick with Enter, reopen it to check the `*` mark, and pick the default (duck) to return; rows (a), (c) and (g) switch through it too.

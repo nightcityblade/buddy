@@ -11,9 +11,9 @@ One JSON object per file, `{id}.json`, the file name equal to `id`.
 | Field | Type | Required | Meaning |
 | --- | --- | --- | --- |
 | `$schema` | string | no | `"../schema/character.schema.json"` in the shipped ones |
-| `id` | `^[a-z0-9][a-z0-9-]{0,31}$` | yes | the name `/buddy use {id}` takes; equals the file name |
+| `id` | `^[a-z0-9][a-z0-9-]{0,31}$` | yes | the name `/buddy-personality` stores; equals the file name |
 | `name` | string, 1 to 40 | yes | display name |
-| `description` | string, 1 to 100 | yes | one line for `/buddy list` and the hover card |
+| `description` | string, 1 to 100 | yes | one line for the menu's preview and the hover card |
 | `author` | string, up to 60 | no | credit |
 | `persona` | string, 1 to 1200 | yes | the voice prompt, in the second person ("You are …") |
 | `color` | an Ink color name or `#rrggbb` | no | the sprite's color, `yellow` by default |
@@ -48,24 +48,24 @@ flowchart LR
   U["characterDir/*.json"] --> M
   M --> R["roster"]
   O["original companion"] -->|withEntry| R
-  R --> C["choose: store, option, professor"]
+  R --> C["choose: store, option, duck"]
 ```
 
 | Source | Where | Marked |
 | --- | --- | --- |
 | Shipped (`builtin`) | the plugin's `characters/`: `professor`, `cat`, `dragon`, `duck`, `ghost`, `robot` | |
-| Your folder (`user`) | the folder the `characterDir` option names; `~` expands to HOME | `(yours)` in `/buddy list` |
+| Your folder (`user`) | the folder the `characterDir` option names; `~` expands to HOME | the menu's Your folder group |
 | Original (`original`) | built from the account's roll and a species template, id `original` | [Original companion](./original-companion.md) |
 
 A file is a candidate when it is a visible `.json` entry that is not a folder (`isCharacterFile`).
 The roster keeps every candidate, valid or not, sorted by id; an id in both folders is taken from yours.
-An invalid file stays in the roster with its first error, so `/buddy list` prints `INVALID: {error}` for it rather than hiding it.
+An invalid file stays in the roster with its first error, so `/buddy-personality` lists it as `{id} (invalid)`, its preview naming the error, rather than hiding it.
 A folder that cannot be listed is logged, and named in the menu's group.
 The roster loads at session start and again on `/buddy reload`.
 
-The character drawn is chosen in order (`choose`): the stored choice (`/buddy use`, the menu), then the `character` option, then `professor`.
-A missing or invalid choice draws the Professor with a bubble `Couldn't load {id}: {why}` for 10 seconds, and the log says it too.
-If `professor.json` itself fails, a stand-in Professor compiled into the engine (`STANDIN_PROFESSOR`) draws, so an error always has a buddy to say it.
+The character drawn is chosen in order (`choose`): the stored choice (Enter in `/buddy-personality`), then the `character` option, then `duck` (`DEFAULT_ID`).
+A missing or invalid choice draws the duck with a bubble `Couldn't load {id}: {why}; /buddy-personality picks another` for 10 seconds, and the log says it too.
+If `duck.json` itself fails, a minimal stand-in duck compiled into the engine (`STANDIN_DEFAULT`) draws, so an error always has a buddy to say it.
 
 ## Line events
 
@@ -74,7 +74,7 @@ A line is never the one said last from the same pool (`pickLine`).
 
 | Event | Fires when | Chance | Shows for |
 | --- | --- | --- | --- |
-| `greeting` | a character is set without an error: session start, `/buddy use`, `/buddy use default`, `/buddy reload`, Enter in the menu; and `/buddy on` | always | 6 s |
+| `greeting` | a character is set without an error: session start, `/buddy reload`, Enter in the menu; and `/buddy on` | always | 6 s |
 | `toolFail` | a finished tool call was denied, or failed without reading like a test failure | always | 6 s |
 | `testPass` | a Bash call's output matches the pass pattern and not the fail one, and the call did not fail | always | 6 s, with confetti |
 | `testFail` | a Bash call's output matches the fail pattern | always | 6 s |
@@ -90,8 +90,8 @@ An original companion's pools come from its species template, with `{name}` fill
 ## How a contributor adds one
 
 1. Write `{id}.json` in a folder of your own; [`CONTRIBUTING.md`](../../CONTRIBUTING.md) has a working example.
-2. Point `characterDir` at the folder and start a session. `/buddy list` shows `{id} (yours)`, or `INVALID:` with the first error.
-3. `/buddy use {id}` draws it. Edit, save, `/buddy reload`. Try a narrow window too.
+2. Point `characterDir` at the folder and start a session. `/buddy-personality` lists it under Your folder, or as `{id} (invalid)` with the first error in its preview.
+3. Enter on it in the menu draws it. Edit, save, `/buddy reload`. Try a narrow window too.
 4. To ship it: add it to `plugins/buddy/characters/` with the relative `$schema`, add a row to the README's Characters table, run the checks, and open a pull request against `develop`.
 
 A shipped character is original work (no copied character, trademark or real person), friendly, not a recolour of one already built in, and MIT-licensed.
@@ -105,16 +105,16 @@ A shipped character is original work (no copied character, trademark or real per
 - **Printable ASCII only.** Rejected: Unicode art. The band counts columns per cell, and wide or ambiguous characters break alignment.
 - **The loader pads and bottom-aligns.** Rejected: requiring exact widths. Authors never count trailing spaces. (Species templates do require exact widths: their eye and hat slots sit at fixed columns.)
 - **A fallback chain for poses.** Rejected: requiring all ten. A small character is complete with `idle` and a walk.
-- **A neutral fallback pool.** Rejected: the Professor's lines as the default. No character ever speaks in another's voice.
+- **A neutral fallback pool.** Rejected: the duck's lines as the default for every character. No character ever speaks in another's voice.
 - **Your file wins an id.** Rejected: the shipped one winning. It lets you restyle a shipped character without forking the plugin.
-- **A stand-in compiled in.** Rejected: drawing nothing when `professor.json` fails. The error needs a buddy to say it.
+- **A stand-in compiled in.** Rejected: drawing nothing when `duck.json` fails. The error needs a buddy to say it.
 
 ## Where it lives
 
 | File | Symbols |
 | --- | --- |
 | [`src/character.ts`](../../plugins/buddy/src/character.ts) | `validateCharacter`, `normalizeFrames`, `parseLines`, `framesFor`, `frameAt`, `POSES`, `LINE_EVENTS`, `POSE_FALLBACK`, `DEFAULT_MOTION`, `MAX_COLS`, `MAX_ROWS`, `MAX_LINE`, `INK_COLORS` |
-| [`src/roster.ts`](../../plugins/buddy/src/roster.ts) | `isCharacterFile`, `loadEntries`, `mergeRoster`, `withEntry`, `choose`, `formatList`, `STANDIN_PROFESSOR`, `DEFAULT_ID` |
+| [`src/roster.ts`](../../plugins/buddy/src/roster.ts) | `isCharacterFile`, `loadEntries`, `mergeRoster`, `withEntry`, `choose`, `STANDIN_DEFAULT`, `DEFAULT_ID` |
 | [`src/lines.ts`](../../plugins/buddy/src/lines.ts) | `GENERIC_LINES`, `poolFor`, `pickLine` |
 | [`hooks/buddy.tsx`](../../plugins/buddy/hooks/buddy.tsx) | `readDir`, `loadRoster`, `applyChoice` |
 | [`src/options.ts`](../../plugins/buddy/src/options.ts) | `expandHome` |
@@ -123,6 +123,6 @@ A shipped character is original work (no copied character, trademark or real per
 ## How it's tested
 
 - Unit: [`tests/character.test.ts`](../../tests/character.test.ts) (defaults, padding, first error by path, pose fallback), [`tests/roster.test.ts`](../../tests/roster.test.ts) (candidates, invalid entries, your file wins, choice order, the stand-in), [`tests/lines.test.ts`](../../tests/lines.test.ts). They use inline fixtures ([`tests/fixtures.ts`](../../tests/fixtures.ts)), never the shipped files.
-- Hooks: the band draws the stored character, defaults to the Professor, and says why for an invalid or unknown choice; `/buddy list` marks the current and the invalid one.
-- Live: rows (a), (c), (g) and (i) load shipped files for real: the Professor, the first other character by id (`cat` today, also the menu's pick), and the one listed after the Professor.
-- Shipped files: `tests/character.test.ts` names the six shipped characters and runs each through `validateCharacter`, as `tests/species.test.ts` does for the species templates, so a broken shipped file fails the suite before it can show as `INVALID` in `/buddy list`.
+- Hooks: the band draws the stored character, defaults to the duck, and says why for an invalid or unknown choice, pointing at `/buddy-personality`.
+- Live: rows (a), (c), (g) and (i) load shipped files for real: the duck, the first other character by id (`cat` today, also the menu's pick), and the one listed after the duck.
+- Shipped files: `tests/character.test.ts` names the six shipped characters and runs each through `validateCharacter`, as `tests/species.test.ts` does for the species templates, so a broken shipped file fails the suite before it can show as `(invalid)` in the menu.

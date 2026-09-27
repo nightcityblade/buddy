@@ -18,7 +18,7 @@ export const MENU_MAX_ROWS = 30;
 export const PREVIEW_ROWS = 14;
 
 export type Pick = { kind: 'use'; id: string } | { kind: 'original'; variant: Variant };
-/** `about`: the line the preview says of it, the description /buddy list shows, or an original's personality. */
+/** `about`: the line the preview says of it, its description, or an original's personality. */
 export type Item = { key: string; label: string; pick: Pick; character?: Character; about?: string; error?: string };
 /** A titled group: its rows, and lines said in place of rows (an error, an empty group). */
 export type Section = { title: string; lines: string[]; items: Item[] };

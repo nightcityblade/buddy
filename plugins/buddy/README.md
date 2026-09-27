@@ -1,16 +1,14 @@
 # buddy
 
-A tiny companion that walks on your Claude Code prompt line and talks back: the Professor by default, five more characters built in (`duck`, `cat`, `robot`, `ghost`, `dragon`), or your own.
+A tiny companion that walks on your Claude Code prompt line and talks back: Quack the duck by default, five more characters built in (`professor`, `cat`, `robot`, `ghost`, `dragon`), or your own.
 
 ```text
 /buddy                  pet it
-/buddy list             every character, the current one starred
-/buddy use {id}         switch, and remember it (/buddy use default goes back)
 /buddy off | on         hide or show it, remembered
 /buddy reload           rescan the characters after you edit one
 /buddy help             usage
 /buddy {question}       a one-line answer, in character
-/buddy-personality      a menu with a live preview: pick your buddy
+/buddy-personality      see every character and switch, remembered, with a live preview
 ```
 
 It reacts to the work: a failed tool call, a test run passing or failing. A question forks this chat by default, so the answer sees the conversation and reads its prompt cache; the options `questionMode`, `quips`, `quipModel` and `quipCooldownSec` decide what spends tokens, and `memory` (default 6, 0 = off, at most 30) how many recent exchanges it remembers, a question with its answer or a line it said on its own, per session and per character. Your own characters are JSON files in the folder the `characterDir` option names.

@@ -26,33 +26,36 @@ The script drives a real, interactive Claude Code session and reads the screen.
 - **The session.** tmux on a private socket (`-L buddy-proof`), a 160 × 50 window, never your own tmux server. The real Claude binary (`CLAUDE_BIN`, else `claude` resolved past a text wrapper), with `--model haiku --setting-sources project --allowedTools Bash --plugin-dir plugins/buddy`, a fresh `--session-id`, and function hooks on.
 - **The options.** A settings file pins them under `buddy@inline`, the id a `--plugin-dir` copy reads: `questionMode: fork`, `quips: false`, `motion: true`.
 - **The boot.** The trust dialog defaults to "No, exit", so the script presses Down, then Enter.
-- **What it reads.** What is drawn, from the pane (`tmux capture-pane`). The art to look for, from the characters' own JSON: rows of four or more visible characters, and for a second character only rows the Professor lacks. The bubble, as the text between the round border's bars. Each command's reply, from the session transcript's `<local-command-stdout>`, so a reply is read as data, not scraped.
+- **What it reads.** What is drawn, from the pane (`tmux capture-pane`). The art to look for, from the characters' own JSON: rows of four or more visible characters, and for a second character only rows the duck lacks. The bubble, as the text between the round border's bars. Each command's reply, from the session transcript's `<local-command-stdout>`, so a reply is read as data, not scraped.
 - **The evidence.** A timestamped run directory keeps every pane capture, the drive log and a copy of the transcript; each row of the table prints the evidence it saw.
 
-It spends a few cents of Haiku, and resets this plugin copy's `/buddy on` and `/buddy use` choices.
+It spends a few cents of Haiku, and resets this plugin copy's `/buddy on` and `/buddy-personality` choices. `--setting-sources project` keeps the user's own settings, and so their `character` option, out of the run.
+
+Every switch goes through the menu (`menu_pick`): open `/buddy-personality`, read which shipped entry holds the `*` (the highlight opens on it), press Up or Down the difference in id order, Enter. A menu marking no shipped entry stops the run with exit 2. `menu_mark` reopens it, reads the `*`, and closes it with Esc.
 
 | Row | Drives | Passes when |
 | --- | --- | --- |
-| (a) the Professor is drawn | `/buddy on`, `/buddy use default` | a row of `professor.json`'s art is in the pane |
-| (b) he walks | nothing; three samples 2 s apart, after the greeting | the Professor's rows change between samples |
+| (a) the default (duck) is drawn | `/buddy on`, a menu pick of the duck | a row of `duck.json`'s art is in the pane |
+| (b) it walks | nothing; three samples 2 s apart, after the greeting | the duck's rows change between samples |
 | (c) `/buddy` pets | `/buddy` | the reply reads `{name}: N pets` |
-| (c) `/buddy list` marks the current one | `/buddy list` | `* professor` in the reply |
+| (c) `/buddy-personality` marks the current one | the menu, then Esc | `* Quack (duck)` in the pane |
 | (d) question before a reply | `/buddy what is your favourite tool`, before the chat's first reply, so the quip model answers | the reply says `Asked`, and the bubble holds an answer: not empty, not a `thinking` line, not "lost the thread" |
-| (e) a test pass shows a `testPass` line | a prompt asking Claude to run `echo 'Tests: 3 passed'` | a line of the Professor's `testPass` pool shows in the bubble |
+| (e) a test pass shows a `testPass` line | a prompt asking Claude to run `echo 'Tests: 3 passed'` | a line of the duck's `testPass` pool shows in the bubble |
 | (f) question after a reply | `/buddy what did we just run`, a real fork of the chat | the bubble holds an answer |
-| (g) `/buddy use {other}` draws it | the first other character by id | a row unique to its art is in the pane |
-| (g) `/buddy use default` returns | `/buddy use default` | the Professor's rows are back |
-| (h) `/buddy off` hides | `/buddy off` | no Professor row in the pane |
-| (h) `/buddy on` shows | `/buddy on` | the Professor's rows are back |
-| (i) the menu opens | `/buddy-personality` | `* {name} (professor)`, `Shipped`, `Your folder` and the Professor's description in the pane, never its persona prompt |
-| (i) Down moves the preview | Down | the preview shows the next entry, no longer the Professor |
-| (i) Esc closes it, nothing changed | Esc | the preview and the groups are gone; the Professor is still drawn |
+| (g) a menu pick of `{other}` draws it | the menu, Down to the first non-duck character by id (`cat`), Enter | a row unique to its art is in the pane |
+| (g) reopened, the menu marks `{other}` | the menu, then Esc | `* {name} ({other})` in the pane |
+| (g) picking the default returns | the menu, Up to the duck, Enter | the duck's rows are back |
+| (h) `/buddy off` hides | `/buddy off` | no duck row in the pane |
+| (h) `/buddy on` shows | `/buddy on` | the duck's rows are back |
+| (i) the menu opens | `/buddy-personality` | `* Quack (duck)`, `Shipped`, `Your folder` and the duck's description in the pane, never its persona prompt |
+| (i) Down moves the preview | Down | the preview shows the next entry, `ghost` |
+| (i) Esc closes it, nothing changed | Esc | the preview and the groups are gone; the duck is still drawn |
 | (i) Enter on `cat` draws it | the menu again, Up to `cat`, Enter | `cat`'s preview showed first; its art is in the band; the pane is gone |
-| (i) `/buddy list` marks `cat` | `/buddy list` | `* cat` in the reply |
-| (i) `/buddy use default` returns | `/buddy use default` | the Professor's rows are back |
+| (i) reopened, the menu marks `cat` | the menu, then Esc | `* {name} (cat)` in the pane |
+| (i) picking the default returns | the menu, Down to the duck, Enter | the duck's rows are back |
 | (j) `/buddy remember the word pineapple` | that question | the reply says `Asked`, and the bubble holds an answer |
 | (j) the next answer remembers `pineapple` | `/buddy what word did I ask you to remember?` | the answer holds `pineapple` |
-| (j) the store holds this session's memory | nothing; the plugin's store file is read | its `memory:{session}` record holds the exchanges, no `thinking` filler |
+| (j) the store holds this session's memory | nothing; the plugin's store file is read | its `memory:{session}` record holds the exchanges under `characters.duck`, no `thinking` filler |
 
 ### Why there is no fake HOME
 

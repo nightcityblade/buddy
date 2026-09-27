@@ -20,7 +20,7 @@ import {
 } from '../src/original.ts';
 import { bashCommand, toolOutput } from '../src/reactions.ts';
 import {
-  choose, findEntry, formatList, isCharacterFile, loadEntries, mergeRoster, validIds, withEntry,
+  choose, isCharacterFile, loadEntries, mergeRoster, withEntry,
   type Entry, type LoadedFile, type Roster, type Source,
 } from '../src/roster.ts';
 import type { Scene } from '../src/scene.ts';
@@ -114,7 +114,7 @@ async function loadRoster(st: State, $: EngineInterface): Promise<void> {
   for (const e of st.roster.entries) if (e.error) $.ui.log(`buddy: character ${e.id} (${e.source}) is invalid: ${e.error}`);
 }
 
-/** Draws the stored/option/default choice; a bad one draws the Professor and says why. */
+/** Draws the stored/option/default choice; a bad one draws the default (the duck) and says why. */
 function applyChoice(st: State, $: EngineInterface): void {
   const choice = choose(st.roster, st.storeChoice, st.options.character);
   if (choice.error) $.ui.log(`buddy: ${choice.error}`);
@@ -251,7 +251,7 @@ async function readStore(st: State, $: EngineInterface): Promise<void> {
     const choice = await $.store.get('character');
     st.storeChoice = typeof choice === 'string' && choice !== '' ? choice : undefined;
   } catch (error) {
-    log($, 'reading the /buddy use choice', error);
+    log($, 'reading the stored character choice', error);
   }
   try {
     st.saved = savedOriginalOf(await $.store.get('original'));
@@ -267,7 +267,7 @@ async function startSession(st: State, $: EngineInterface): Promise<void> {
   if ((st.storeChoice ?? st.options.character) === ORIGINAL_ID) await restoreOriginal(st, $);
   applyChoice(st, $);
   try {
-    await $.command.register({ name: COMMAND, description: 'Pet your buddy, ask it something, or: list, use {id}, off, on, reload, help', argumentHint: '[question] | list | use {id} | off | on | reload | help', immediate: true });
+    await $.command.register({ name: COMMAND, description: 'Pet your buddy, ask it something, or: off, on, reload, help; /buddy-personality switches character', argumentHint: '[question] | off | on | reload | help', immediate: true });
   } catch (error) {
     log($, `registering /${COMMAND}`, error);
   }
@@ -564,7 +564,7 @@ async function openMenu(st: State, $: EngineInterface): Promise<{ text: string }
   return { text: `${MENU_TITLE}: ↑/↓ move, Enter picks, Esc closes.` };
 }
 
-/** Enter on a row: the same switch and memory as /buddy use, then the pane closes and the new one greets. */
+/** Enter on a row: switches and remembers the choice (the store's `character`), then the pane closes and the new one greets. */
 async function pickItem(st: State, $: EngineInterface, item: Item): Promise<void> {
   const b = st.b;
   const menu = st.menu;
@@ -693,28 +693,6 @@ async function runCommand(st: State, $: EngineInterface, args: string): Promise<
         refresh(st, $);
         return { text: `${b.character.name}: ${b.pets} pets${note}` };
       }
-      case 'list':
-        return { text: formatList(st.roster, b.character, st.options.errors) };
-      case 'use': {
-        const entry = findEntry(st.roster, action.id);
-        const valid = validIds(st.roster).join(', ') || 'none';
-        if (!entry) return { text: `No character "${action.id}". Valid: ${valid}` };
-        if (!entry.character) return { text: `Can't use ${action.id}: ${entry.error}. Valid: ${valid}` };
-        st.storeChoice = action.id;
-        const note = await save($, 'character', action.id);
-        setCharacter(b, entry.character, undefined, Math.random);
-        startClock(st, $);
-        refresh(st, $);
-        return { text: `Now: ${entry.character.name}${note}` };
-      }
-      case 'useDefault': {
-        st.storeChoice = undefined;
-        const note = await save($, 'character', undefined);
-        applyChoice(st, $);
-        startClock(st, $);
-        refresh(st, $);
-        return { text: `Back to the default: ${b.character.name}${note}` };
-      }
       case 'off': {
         const line = farewell(b, Math.random);
         heard(st, $);
@@ -746,8 +724,6 @@ async function runCommand(st: State, $: EngineInterface, args: string): Promise<
       }
       case 'help':
         return { text: [USAGE, ...st.options.errors].join('\n') };
-      case 'usage':
-        return { text: action.message };
       case 'question': {
         if (st.options.questionMode === 'off') return { text: 'questions are off (questionMode)' };
         if (st.hidden) return { text: `${b.character.name} is hidden; /buddy on first` };

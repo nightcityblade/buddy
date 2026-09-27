@@ -1,7 +1,8 @@
 # buddy — a Claude Code function-hooks plugin: an ASCII companion above the prompt that reacts to the work and answers `/buddy` questions
+
 The repo is its own marketplace, and `main` reaches every user at their next `plugin update`: a hook that throws or blocks breaks the prompt line of everyone who installed it.
 
-# Vocabulary
+## Vocabulary
 
 - behavioural spec: what buddy does, its commands, options and character fields · `README.md`
 - plugin directory: everything that installs and nothing else · `plugins/buddy/`
@@ -18,49 +19,49 @@ The repo is its own marketplace, and `main` reaches every user at their next `pl
 - CI: the gates on push and pull request, and the GitHub release on a tag · `.github/workflows/`
 - repo agents: `gitter`, the only git writer · `.claude/agents/`
 
-# Runtime
+## Runtime
 
-## Claude Code
+### Claude Code
 
 - Function hooks run only with `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`: the hook tests, `npm run validate:plugin` and a real session all need it.
 - The `AbovePrompt` site is raised in the terminal and the desktop app only; VS Code and mobile never raise it, which the README states and the adapter does not work around.
 - Loaded with `--plugin-dir plugins/buddy`, the plugin reads its options under `pluginConfigs["buddy@inline"]`; installed, under `buddy@buddy`.
 
-## Local
+### Local
 
 - `npm test` (vitest, then `claude plugin test plugins/buddy`), `npm run typecheck` and `npm run validate:plugin` (root and plugin, `--strict`) pass before a commit.
 - `npm run live` runs the live proof with `--plugin-dir plugins/buddy`; run it after any change to the adapter.
 - `npm run release:check` proves a release's versions and CHANGELOG section.
 
-## CI
+### CI
 
 - `.github/workflows/ci.yml` runs the three gates on every push to `{develop|main}` and every pull request; on a pull request into `main`, its `release` job requires the version to move past `main`'s.
 - `.github/workflows/release.yml` publishes the GitHub release from the CHANGELOG section when a `buddy--v*` tag on `main` is pushed.
 
-# Rules
+## Rules
 
-## Publication
+### Publication
 
 - **NEVER a machine-absolute path** (under `/Users`, `/home` or `/private`), personal data or a private project name in a tracked file.
 - **NEVER push code or cut a release without the owner's ask**; a README or marketing commit on `develop` is pushed as soon as it is committed.
 - **`main` MUST move only by merging the `develop → main` pull request**, with a merge commit and never a squash, so both branches share one history.
 
-## Engine
+### Engine
 
 - A new behaviour lands in the engine as a pure function with a test watched failing first; the adapter only wires it.
 - `$` is passed only to functions declared at the top level of the adapter and always spelled `$.noun.event(...)`, and `$.env` names are string literals: otherwise Claude Code loads the module with zero hooks, and `npm run validate:plugin` reports it.
 - Every hook catches, logs `buddy: {what} failed: {err}` with `$.ui.log`, and returns `next(e)` or the original result.
-- A failure shows on screen: a missing or invalid character draws the Professor with a bubble naming the error, and `/buddy list` names it too.
+- A failure shows on screen: a missing or invalid character draws the duck with a bubble naming the error and pointing at `/buddy-personality`, which lists it as `(invalid)`.
 - Only a `/buddy` question, or `quips` when on, calls a model; walking, reactions and every other command stay local.
 - Dev files live outside the plugin directory, which installs whole.
 
-## Characters
+### Characters
 
 - A built-in character carries `"$schema": "../schema/character.schema.json"`, validates against it, and its art and persona are original.
 - A missing line pool falls back to the engine's neutral pool, in no character's voice.
 - A change to a command, an option or a character field moves `README.md`, `CONTRIBUTING.md` and the schema in the same commit.
 
-## Branches and releases
+### Branches and releases
 
 - `develop` is the default branch: every change lands there, by a commit or a pull request.
 - A version bump moves `plugins/buddy/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `package.json` and the README badge together, and turns `## [Unreleased]` in `CHANGELOG.md` into `## [X.Y.Z] — {date}`; installed copies update only on a new version.

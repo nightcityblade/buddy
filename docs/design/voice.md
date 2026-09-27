@@ -6,7 +6,7 @@ Everything else it says is a canned line ([Characters](./characters.md)), and ev
 ## Questions
 
 `/buddy` followed by anything that is not a command is a question.
-A command word counts only when it stands alone, so `/buddy list the files` is a question, not `/buddy list` (`parseCommand`).
+A command word counts only when it stands alone, so `/buddy reload the page` is a question, not `/buddy reload` (`parseCommand`).
 
 The `questionMode` option picks the path: `fork` (the default), `complete`, or `off`.
 
@@ -87,7 +87,7 @@ Like every option, it is resolved once at load by `resolveOptions`: a value of t
 - **Quips off by default, only after tool use, with a cooldown.** Rejected: a quip after every turn. It would spend tokens on every message and repeat itself.
 - **The quip sees a summary, not the turn.** Rejected: sending the turn's output. A tally and one command are enough to react to, and cost a few dozen tokens.
 - **A failure shows in the bubble.** Rejected: staying silent. An empty bubble would read as "it did not hear me".
-- **Command words only when alone.** Rejected: matching the first word. `/buddy list the files` is a question.
+- **Command words only when alone.** Rejected: matching the first word. `/buddy reload the page` is a question.
 
 ## Where it lives
 

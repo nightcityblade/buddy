@@ -30,7 +30,7 @@ function fixture(id: string, name: string, face: string, lines: Record<string, s
 }
 
 const FILES: Record<string, string> = {
-  'professor.json': fixture('professor', 'Professor Fixture', 'p_p', { greeting: ['Professor fixture here.'] }),
+  'duck.json': fixture('duck', 'Duck Fixture', 'd_d', { greeting: ['Duck fixture here.'] }),
   'fixy.json': fixture('fixy', 'Fixy', 'f_f', {
     greeting: ['Fixy says hi.'],
     petted: ['Fixy purrs.'],
@@ -159,20 +159,20 @@ describe('the band', () => {
     await ui.unmount();
   });
 
-  test('defaults to the professor', async ($, on) => {
+  test('defaults to the duck', async ($, on) => {
     world(on);
     await $.session.start(START);
     const ui = await band($);
-    expect(await shows(ui, /\(p_p\)/)).toBe(true);
-    expect(await shows(ui, /Professor fixture here\./)).toBe(true);
+    expect(await shows(ui, /\(d_d\)/)).toBe(true);
+    expect(await shows(ui, /Duck fixture here\./)).toBe(true);
     await ui.unmount();
   });
 
-  test('an invalid choice draws the professor and says why, in the bubble and the log', async ($, on) => {
+  test('an invalid choice draws the duck and says why, in the bubble and the log', async ($, on) => {
     const w = world(on, { character: 'broken' });
     await $.session.start(START);
     const ui = await band($);
-    expect(await shows(ui, /\(p_p\)/)).toBe(true);
+    expect(await shows(ui, /\(d_d\)/)).toBe(true);
     expect(await shows(ui, /Couldn't load broken: persona: required/)).toBe(true);
     expect(w.logs).toContain('buddy: character broken (builtin) is invalid: persona: required');
     await ui.unmount();
@@ -182,7 +182,7 @@ describe('the band', () => {
     world(on, { character: 'ghost' });
     await $.session.start(START);
     const ui = await band($);
-    expect(await shows(ui, /Couldn't load ghost: no such character/)).toBe(true);
+    expect(await shows(ui, /Couldn't load ghost: no such character; \/buddy-personality picks another/)).toBe(true);
     await ui.unmount();
   });
 
@@ -229,30 +229,6 @@ describe('/buddy', () => {
     expect((await $.command.run(run(''))).text).toBe('Fixy: 5 pets');
     expect(w.saved.get('pets')).toBe(5);
     expect(await shows(ui, /Fixy purrs\./)).toBe(true);
-    await ui.unmount();
-  });
-
-  test('list marks the current one and the invalid one', async ($, on) => {
-    world(on, { character: 'fixy' });
-    await $.session.start(START);
-    const out = (await $.command.run(run('list'))).text;
-    expect(out).toContain('* fixy - Fixy: Fixy, a test fixture.');
-    expect(out).toContain('  broken - INVALID: persona: required');
-    expect(out).toContain('  professor - Professor Fixture');
-    expect(out).not.toContain('notes');
-  });
-
-  test('use switches and persists; use default clears; an unknown id lists the valid ones', async ($, on) => {
-    const w = world(on);
-    await $.session.start(START);
-    const ui = await band($);
-    expect((await $.command.run(run('use fixy'))).text).toBe('Now: Fixy');
-    expect(w.saved.get('character')).toBe('fixy');
-    expect(await shows(ui, /\(f_f\)/)).toBe(true);
-    expect((await $.command.run(run('use ghost'))).text).toBe('No character "ghost". Valid: fixy, professor');
-    expect((await $.command.run(run('use broken'))).text).toBe("Can't use broken: persona: required. Valid: fixy, professor");
-    expect((await $.command.run(run('use default'))).text).toBe('Back to the default: Professor Fixture');
-    expect(w.saved.has('character')).toBe(false);
     await ui.unmount();
   });
 
@@ -341,12 +317,16 @@ describe('/buddy', () => {
     const ui = await band($);
     await $.command.run(run('remember the word pineapple'));
     await w.clock.settle();
-    await $.command.run(run('use professor'));
+    await $.command.run(menu());
+    const pane = await paneOf($);
+    await pane.press({ key: 'use:duck' });
+    await w.clock.settle();
+    await pane.unmount();
     await ui.unmount();
     const again = await band($);
     await $.command.run(run('what word?'));
     await w.clock.settle();
-    expect(w.forks[1]).toContain('Professor Fixture: Professor fixture here.');
+    expect(w.forks[1]).toContain('Duck Fixture: Duck fixture here.');
     expect(w.forks[1]).not.toMatch(/pineapple|Forty-two|Fixy/);
     await again.unmount();
   });
@@ -488,7 +468,7 @@ describe('/buddy-personality', () => {
     const pane = await paneOf($);
     for (const title of [/^Shipped$/, /^Yours$/, /^Your folder$/]) expect(await shows(pane, title)).toBe(true);
     expect(await label(pane, 'use:fixy')).toBe('* Fixy (fixy)');
-    expect(await label(pane, 'use:professor')).toBe('  Professor Fixture (professor)');
+    expect(await label(pane, 'use:duck')).toBe('  Duck Fixture (duck)');
     expect(await label(pane, 'use:broken')).toBe('  broken (invalid)');
     expect(await shows(pane, /^Fixy$/)).toBe(true);
     expect(await shows(pane, /^Fixy, a test fixture\.$/)).toBe(true);
@@ -504,18 +484,42 @@ describe('/buddy-personality', () => {
     const ui = await band($);
     await $.command.run(menu());
     const pane = await paneOf($);
-    await focus($, 'use:professor');
-    expect(await shows(pane, /^Professor Fixture$/)).toBe(true);
+    await focus($, 'use:duck');
+    expect(await shows(pane, /^Duck Fixture$/)).toBe(true);
     expect(await shows(pane, /^Fixy$/)).toBe(false);
     await focus($, 'use:broken');
     expect(await shows(pane, /^Can't draw it: persona: required$/)).toBe(true);
-    await pane.press({ key: 'use:professor' });
+    await pane.press({ key: 'use:duck' });
     await w.clock.settle();
-    expect(w.saved.get('character')).toBe('professor');
-    expect(await shows(ui, /\(p_p\)/)).toBe(true);
-    expect(await shows(ui, /Professor fixture here\./)).toBe(true);
-    expect((await $.command.run(run('list'))).text).toContain('* professor - Professor Fixture');
+    expect(w.saved.get('character')).toBe('duck');
+    expect(await shows(ui, /\(d_d\)/)).toBe(true);
+    expect(await shows(ui, /Duck fixture here\./)).toBe(true);
     expect(w.closes).toEqual([PANE]);
+    await pane.unmount();
+    await $.command.run(menu());
+    const again = await paneOf($);
+    expect(await label(again, 'use:duck')).toBe('* Duck Fixture (duck)');
+    expect(await label(again, 'use:fixy')).toBe('  Fixy (fixy)');
+    await again.unmount();
+    await ui.unmount();
+  });
+
+  test('an invalid entry cannot be picked; picking the configured default goes back to it', async ($, on) => {
+    const w = world(on, { character: 'fixy' }, {}, { files: { [CONFIG]: config() } });
+    await $.session.start(START);
+    const ui = await band($);
+    await $.command.run(menu());
+    const pane = await paneOf($);
+    await pane.press({ key: 'use:broken' });
+    await w.clock.settle();
+    expect(w.logs).toContain("buddy: /buddy-personality: can't pick broken (invalid): persona: required");
+    expect(w.saved.get('character')).toBe('fixy');
+    expect(await shows(ui, /\(f_f\)/)).toBe(true);
+    await pane.press({ key: 'use:duck' });
+    await w.clock.settle();
+    expect(w.saved.get('character')).toBe('duck');
+    expect(await shows(ui, /\(d_d\)/)).toBe(true);
+    await pane.unmount();
     await ui.unmount();
   });
 
@@ -527,13 +531,13 @@ describe('/buddy-personality', () => {
     const ui = await band($);
     await $.command.run(menu());
     const pane = await paneOf($);
-    await focus($, 'use:professor');
-    expect(await shows(pane, /^Professor Fixture$/)).toBe(true);
+    await focus($, 'use:duck');
+    expect(await shows(pane, /^Duck Fixture$/)).toBe(true);
     expect(w.opens).toMatchObject([{ closeOnEscape: true }]);
     expect(w.closes).toEqual([]);
     expect(w.saved.get('character')).toBe('fixy');
     expect(await shows(ui, /\(f_f\)/)).toBe(true);
-    expect((await $.command.run(run('list'))).text).toContain('* fixy - Fixy');
+    expect(await label(pane, 'use:fixy')).toBe('* Fixy (fixy)');
     await pane.unmount();
     await ui.unmount();
   });
@@ -562,7 +566,11 @@ describe('/buddy-personality', () => {
     expect(w.saved.get('original')).toEqual({ variant: 'npm', soul: MOCHI });
     expect(await shows(ui, eyesOf('npm'))).toBe(true);
     expect(await shows(ui, /Mochi says hello\./)).toBe(true);
-    expect((await $.command.run(run('list'))).text).toContain('* original - Mochi: ');
+    await pane.unmount();
+    await $.command.run(menu());
+    const again = await paneOf($);
+    expect(await label(again, 'original:npm')).toBe('* Mochi — npm install');
+    await again.unmount();
     expect(w.writes).toEqual([]);
     expect(w.logs.join('\n')).not.toContain(UUID);
     expect(JSON.stringify([...w.saved.entries()])).not.toContain(UUID);
@@ -578,11 +586,11 @@ describe('/buddy-personality', () => {
     await ui.unmount();
   });
 
-  test('a restart without ~/.claude.json draws the professor and says why', async ($, on) => {
+  test('a restart without ~/.claude.json draws the duck and says why', async ($, on) => {
     world(on, { character: 'original', original: { variant: 'native', soul: MOCHI } });
     await $.session.start(START);
     const ui = await band($);
-    expect(await shows(ui, /\(p_p\)/)).toBe(true);
+    expect(await shows(ui, /\(d_d\)/)).toBe(true);
     expect(await shows(ui, /Couldn't load original: couldn't read ~\/\.claude\.json/)).toBe(true);
     await ui.unmount();
   });

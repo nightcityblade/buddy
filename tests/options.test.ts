@@ -4,7 +4,7 @@ import { DEFAULTS, expandHome, resolveOptions } from '../plugins/buddy/src/optio
 describe('resolveOptions', () => {
   test('the manifest defaults', () => {
     expect(resolveOptions({})).toEqual({ ...DEFAULTS, errors: [] });
-    expect(DEFAULTS).toEqual({ character: 'professor', characterDir: '', motion: true, questionMode: 'fork', quips: false, quipModel: 'haiku', quipCooldownSec: 45, memory: 6 });
+    expect(DEFAULTS).toEqual({ character: 'duck', characterDir: '', motion: true, questionMode: 'fork', quips: false, quipModel: 'haiku', quipCooldownSec: 45, memory: 6 });
   });
   test('good values', () => {
     const o = resolveOptions({ character: ' Cat ', characterDir: '~/chars', motion: false, questionMode: 'COMPLETE', quips: 'true', quipModel: 'sonnet', quipCooldownSec: '10' });
