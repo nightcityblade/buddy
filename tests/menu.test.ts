@@ -65,15 +65,17 @@ describe('moving and marking', () => {
 
 describe('previewOf', () => {
   const m = buildMenu(input());
-  test('the idle frames turn; name, one-line persona, greeting', () => {
+  test('the idle frames turn; name, description (never the persona prompt), greeting', () => {
     const p0 = previewOf(findItem(m, 'use:cat'), 0, 0);
     const p1 = previewOf(findItem(m, 'use:cat'), 1, 0);
-    expect(p0).toMatchObject({ kind: 'character', rows: ['(cat)'], name: 'Cat', persona: 'You are Cat, a test.', sample: 'Cat waves.', card: [] });
+    expect(p0).toMatchObject({ kind: 'character', rows: ['(cat)'], name: 'Cat', about: 'Cat.', sample: 'Cat waves.', card: [] });
+    expect(JSON.stringify(p0)).not.toContain('You are Cat');
     expect(p1).toMatchObject({ rows: ['[cat]'] });
   });
   test('an original shows its card; no greeting of its own falls back to the generic one', () => {
     const p = previewOf(findItem(m, 'original:native'), 0, 0);
-    expect(p).toMatchObject({ name: 'Mochi', card: ['blob · ★★★ rare', 'SNARK     ████████░░ 81', 'hatched 2026-04-01'], sample: 'Hello there.' });
+    expect(p).toMatchObject({ name: 'Mochi', about: 'Round.', card: ['blob · ★★★ rare', 'SNARK     ████████░░ 81', 'hatched 2026-04-01'], sample: 'Hello there.' });
+    expect(JSON.stringify(p)).not.toContain('You are Mochi');
   });
   test('an entry that will not draw says why', () => {
     expect(previewOf(findItem(m, 'use:bad'), 0, 0)).toMatchObject({ kind: 'error', label: 'bad (invalid)' });

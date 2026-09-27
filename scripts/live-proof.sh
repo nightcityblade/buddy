@@ -16,6 +16,10 @@
 #       Enter on cat draws the cat and /buddy list marks it; /buddy use
 #       default returns. HOME stays real (a fake one logs the session out), so
 #       no row reads or prints the "Yours" group: hook tests prove that path.
+#   (j) memory: /buddy remember the word pineapple, then /buddy what word did I
+#       ask you to remember? is answered with pineapple; the plugin's store
+#       holds both as exchanges, no thinking filler (its memory:{session} key,
+#       nothing else read)
 # Prints a table, one row per check, and exits 1 when any check fails,
 # 2 when the session could not be driven (no transcript, a turn timed out).
 # Spends real tokens: a few cents of Haiku. It resets this plugin's own
@@ -170,27 +174,28 @@ grep -q -x "$PICK" <<<"$IDS" || { echo "ERROR no $PICK.json in $CHARS"; exit 2; 
 ups=$(( $(grep -n -x professor <<<"$IDS" | cut -d: -f1) - $(grep -n -x "$PICK" <<<"$IDS" | cut -d: -f1) ))
 NEXT=$(grep -A1 -x professor <<<"$IDS" | tail -1)
 rows_of "$PICK" | grep -v -x -F -f "$RUN/professor.rows" > "$RUN/pick.rows"
-# The start of a persona as the preview's one line shows it.
+# The start of a description as the preview's one line shows it (never the persona).
+about_of() { jq -r '.description | gsub("\\s+"; " ") | .[0:40]' "$CHARS/$1.json"; }
 persona_of() { jq -r '.persona | gsub("\\s+"; " ") | .[0:40]' "$CHARS/$1.json"; }
 PROF_NAME=$(jq -r '.name' "$CHARS/professor.json")
 in_pane() { pane | grep -q -F -- "$1"; }
 out=$(command_out "/buddy-personality"); sleep 3
 pane > "$RUN/i-open.txt"
-if in_pane "* $PROF_NAME (professor)" && in_pane "Shipped" && in_pane "Your folder" && in_pane "$(persona_of professor)"; then
+if in_pane "* $PROF_NAME (professor)" && in_pane "Shipped" && in_pane "Your folder" && in_pane "$(about_of professor)" && ! in_pane "$(persona_of professor)"; then
   add "(i) /buddy-personality opens the menu" PASS "$out"
 else add "(i) /buddy-personality opens the menu" FAIL "$out / pane in $RUN/i-open.txt"; fi
 $T send-keys -t proof Down; sleep 2
 pane > "$RUN/i-down.txt"
-if in_pane "$(persona_of "$NEXT")" && ! in_pane "$(persona_of professor)"; then add "(i) Down moves the preview to $NEXT" PASS "preview shows the $NEXT persona"
+if in_pane "$(about_of "$NEXT")" && ! in_pane "$(about_of professor)"; then add "(i) Down moves the preview to $NEXT" PASS "preview shows the $NEXT description"
 else add "(i) Down moves the preview to $NEXT" FAIL "pane in $RUN/i-down.txt"; fi
 $T send-keys -t proof Escape; sleep 2
 pane > "$RUN/i-esc.txt"
-if ! in_pane "$(persona_of "$NEXT")" && ! in_pane "Your folder" && shows_any "$RUN/professor.rows"; then add "(i) Esc closes it, nothing changed" PASS "pane gone, the Professor still drawn"
+if ! in_pane "$(about_of "$NEXT")" && ! in_pane "Your folder" && shows_any "$RUN/professor.rows"; then add "(i) Esc closes it, nothing changed" PASS "pane gone, the Professor still drawn"
 else add "(i) Esc closes it, nothing changed" FAIL "pane in $RUN/i-esc.txt"; fi
 command_out "/buddy-personality" >/dev/null; sleep 3
 for _ in $(seq 1 "$ups"); do $T send-keys -t proof Up; sleep 0.5; done
 sleep 1
-if in_pane "$(persona_of "$PICK")"; then pre=ok; else pre="no $PICK preview"; fi
+if in_pane "$(about_of "$PICK")"; then pre=ok; else pre="no $PICK preview"; fi
 $T send-keys -t proof Enter; sleep 3
 pane > "$RUN/i-pick.txt"
 if [ "$pre" = ok ] && shows_any "$RUN/pick.rows" && ! in_pane "Your folder"; then add "(i) Enter on $PICK draws it, pane closed" PASS "$PICK sprite row in the pane"
@@ -199,6 +204,22 @@ out=$(command_out "/buddy list")
 if grep -q "\* $PICK " <<<"$out"; then add "(i) /buddy list marks $PICK" PASS "$(grep -o "\* $PICK[^*]*" <<<"$out" | head -c 60)"; else add "(i) /buddy list marks $PICK" FAIL "$out"; fi
 out=$(command_out "/buddy use default"); sleep 3
 if shows_any "$RUN/professor.rows"; then add "(i) /buddy use default returns" PASS "$out"; else add "(i) /buddy use default returns" FAIL "$out"; fi
+
+out=$(command_out "/buddy remember the word pineapple")
+got=$(answered); v=$?
+[ $v -eq 0 ] && grep -q 'Asked' <<<"$out" && add "(j) /buddy remember the word pineapple" PASS "$got" || add "(j) /buddy remember the word pineapple" FAIL "$out / $got"
+echo "$got" > "$RUN/j-first.txt"
+out=$(command_out "/buddy what word did I ask you to remember?")
+got=$(answered); v=$?
+echo "$got" > "$RUN/j-second.txt"
+if [ $v -eq 0 ] && grep -q -i 'pineapple' <<<"$got"; then add "(j) the next answer remembers pineapple" PASS "$got"; else add "(j) the next answer remembers pineapple" FAIL "$out / $got"; fi
+# This plugin's store (the --plugin-dir copy): only the key of this session is read.
+STORE=$(ls "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/store/buddy_inline-*.json 2>/dev/null | head -1)
+mem=$([ -n "$STORE" ] && jq -r --arg k "memory:$ID" '.[$k].characters.professor[]? | if .kind == "question" then "question: \(.question) -> \(.answer // "(no answer)")" else "\(.kind): \(.text)" end' "$STORE" 2>&1)
+echo "$mem" > "$RUN/j-memory.txt"
+if grep -q -F 'question: remember the word pineapple -> ' <<<"$mem" && grep -q -F 'question: what word did I ask you to remember? -> ' <<<"$mem" && ! grep -q -F -f "$RUN/thinking.pool" <<<"$mem"; then
+  add "(j) the store holds this session's memory" PASS "$(grep -c . <<<"$mem") exchanges under memory:$ID, no thinking filler"
+else add "(j) the store holds this session's memory" FAIL "${STORE:-no buddy_inline store file}: $(head -c 80 <<<"$mem")"; fi
 
 cp "$(transcript)" "$RUN/main.jsonl"
 echo

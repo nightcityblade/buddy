@@ -1,6 +1,8 @@
 // The plugin's userConfig, resolved to typed values with the manifest's
 // defaults; a bad value is ignored by name and listed, never silently.
 
+import { MEMORY_DEFAULT, MEMORY_MAX } from './memory.ts';
+
 export type QuestionMode = 'fork' | 'complete' | 'off';
 export const QUESTION_MODES: readonly QuestionMode[] = ['fork', 'complete', 'off'];
 
@@ -12,6 +14,8 @@ export type Options = {
   quips: boolean;
   quipModel: string;
   quipCooldownSec: number;
+  /** How many recent exchanges the buddy remembers per session and character; 0 = off. */
+  memory: number;
   errors: string[];
 };
 
@@ -23,6 +27,7 @@ export const DEFAULTS: Omit<Options, 'errors'> = {
   quips: false,
   quipModel: 'haiku',
   quipCooldownSec: 45,
+  memory: MEMORY_DEFAULT,
 };
 
 function bool(v: unknown): boolean | undefined {
@@ -35,7 +40,7 @@ function bool(v: unknown): boolean | undefined {
 export function resolveOptions(raw: Record<string, unknown>): Options {
   const o: Options = { ...DEFAULTS, errors: [] };
   const bad = (key: string, why: string) => o.errors.push(`option ${key} ignored: ${why}`);
-  const { character, characterDir, motion, questionMode, quips, quipModel, quipCooldownSec } = raw;
+  const { character, characterDir, motion, questionMode, quips, quipModel, quipCooldownSec, memory } = raw;
   if (character !== undefined && character !== '') {
     if (typeof character === 'string') o.character = character.trim().toLowerCase();
     else bad('character', 'not a string');
@@ -67,6 +72,14 @@ export function resolveOptions(raw: Record<string, unknown>): Options {
     const n = typeof quipCooldownSec === 'number' ? quipCooldownSec : Number(quipCooldownSec);
     if (Number.isFinite(n) && n >= 0) o.quipCooldownSec = n;
     else bad('quipCooldownSec', `${JSON.stringify(quipCooldownSec)} is not a number of seconds`);
+  }
+  if (memory !== undefined && memory !== '') {
+    const n = typeof memory === 'number' ? memory : typeof memory === 'string' ? Number(memory) : NaN;
+    if (!Number.isInteger(n) || n < 0) bad('memory', `${JSON.stringify(memory)} is not a whole number of exchanges; remembering ${MEMORY_DEFAULT}`);
+    else if (n > MEMORY_MAX) {
+      o.memory = MEMORY_MAX;
+      o.errors.push(`option memory capped: ${n} is above ${MEMORY_MAX}; remembering ${MEMORY_MAX}`);
+    } else o.memory = n;
   }
   return o;
 }

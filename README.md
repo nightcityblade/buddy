@@ -123,7 +123,7 @@ the left, a live preview of the highlighted one on the right.
 - **Your folder**: your own characters, from the `characterDir` option.
 
 ↑ and ↓ move the highlight, and the preview follows: the sprite in its idle
-animation, the name, the persona in one line and a greeting in its voice;
+animation, the name, its description (for your original, its saved personality) and a greeting in its voice;
 for your original companion also its rarity stars, shiny, the five stats as
 bars (`SNARK     ████████░░ 81`) and the day it hatched. `*` marks the one
 drawn now. Enter switches to the highlighted one and remembers it, as
@@ -136,6 +136,8 @@ never shown, saved or logged. `/buddy use default` goes back to the
 `character` option.
 
 ## 🧠 How it works
+
+The full design, decision by decision, lives in [docs/design](docs/design/_index.md).
 
 - **Walking.** The character steps one column every `stepMs` (200 ms unless
   the character says otherwise), turns at the edge, and rests now and then.
@@ -189,6 +191,7 @@ ignores options under any other key.
 | `quips` | boolean | `false` | Model-written one-liners at the end of a turn (spends tokens) |
 | `quipModel` | string | `"haiku"` | Model for quips and fresh-session answers |
 | `quipCooldownSec` | number | `45` | Minimum seconds between quips |
+| `memory` | number | `6` | How many recent exchanges the buddy remembers (0 = off): a /buddy question with its answer, or one line it said on its own; kept per session and per character, they go into its next answer or quip; at most 30 |
 
 ```json
 {

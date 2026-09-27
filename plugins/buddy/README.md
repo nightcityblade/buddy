@@ -13,7 +13,7 @@ A tiny companion that walks on your Claude Code prompt line and talks back: the 
 /buddy-personality      a menu with a live preview: pick your buddy
 ```
 
-It reacts to the work: a failed tool call, a test run passing or failing. A question forks this chat by default, so the answer sees the conversation and reads its prompt cache; the options `questionMode`, `quips`, `quipModel` and `quipCooldownSec` decide what spends tokens. Your own characters are JSON files in the folder the `characterDir` option names.
+It reacts to the work: a failed tool call, a test run passing or failing. A question forks this chat by default, so the answer sees the conversation and reads its prompt cache; the options `questionMode`, `quips`, `quipModel` and `quipCooldownSec` decide what spends tokens, and `memory` (default 6, 0 = off, at most 30) how many recent exchanges it remembers, a question with its answer or a line it said on its own, per session and per character. Your own characters are JSON files in the folder the `characterDir` option names.
 
 ## Pick a personality
 

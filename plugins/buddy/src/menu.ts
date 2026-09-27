@@ -18,7 +18,8 @@ export const MENU_MAX_ROWS = 30;
 export const PREVIEW_ROWS = 14;
 
 export type Pick = { kind: 'use'; id: string } | { kind: 'original'; variant: Variant };
-export type Item = { key: string; label: string; pick: Pick; character?: Character; error?: string };
+/** `about`: the line the preview says of it, the description /buddy list shows, or an original's personality. */
+export type Item = { key: string; label: string; pick: Pick; character?: Character; about?: string; error?: string };
 /** A titled group: its rows, and lines said in place of rows (an error, an empty group). */
 export type Section = { title: string; lines: string[]; items: Item[] };
 export type Menu = { sections: Section[] };
@@ -44,7 +45,7 @@ export function itemKey(p: Pick): string {
 
 function entryItem(e: Entry): Item {
   const pick: Pick = { kind: 'use', id: e.id };
-  return e.character ? { key: itemKey(pick), label: `${e.character.name} (${e.id})`, pick, character: e.character } : { key: itemKey(pick), label: `${e.id} (invalid)`, pick, error: e.error ?? 'invalid' };
+  return e.character ? { key: itemKey(pick), label: `${e.character.name} (${e.id})`, pick, character: e.character, about: e.character.description } : { key: itemKey(pick), label: `${e.id} (invalid)`, pick, error: e.error ?? 'invalid' };
 }
 
 function yours(o: Originals): Section {
@@ -54,8 +55,10 @@ function yours(o: Originals): Section {
   const items = o.rolls.map((r): Item => {
     const pick: Pick = { kind: 'original', variant: r.variant };
     const item: Item = { key: itemKey(pick), label: originalLabel(o.soul.name, r.variant), pick };
-    if (r.character) item.character = r.character;
-    else item.error = r.error ?? 'no art for it';
+    if (r.character) {
+      item.character = r.character;
+      item.about = o.soul.personality || r.character.description;
+    } else item.error = r.error ?? 'no art for it';
     return item;
   });
   return { title, lines: [...(o.from ? [`From the backup ${o.from}.`] : []), ...o.notes], items };
@@ -108,14 +111,14 @@ export function menuRows(m: Menu): number {
 }
 
 export type Preview =
-  | { kind: 'character'; rows: string[]; color: string; name: string; persona: string; sample: string; card: string[] }
+  | { kind: 'character'; rows: string[]; color: string; name: string; about: string; sample: string; card: string[] }
   | { kind: 'error'; label: string; error: string };
 
 function oneLine(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-/** What the right side shows for `item`: its idle frame `frame`, name, persona, greeting and card; or why it cannot. */
+/** What the right side shows for `item`: its idle frame `frame`, name, one line about it (never its persona prompt), greeting and card; or why it cannot. */
 export function previewOf(item: Item | undefined, frame: number, now: number): Preview {
   if (!item) return { kind: 'error', label: 'Nothing to preview', error: 'no entry is highlighted' };
   const c = item.character;
@@ -125,7 +128,7 @@ export function previewOf(item: Item | undefined, frame: number, now: number): P
     rows: [...frameAt(c, 'idle', frame)],
     color: spriteColor(c, now),
     name: c.name,
-    persona: oneLine(c.persona),
+    about: oneLine(item.about ?? c.description),
     sample: poolFor(c, 'greeting')[0] ?? '',
     card: c.card ? [c.card.subtitle, ...c.card.rows] : [],
   };

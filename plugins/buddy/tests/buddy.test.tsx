@@ -45,10 +45,11 @@ const FILES: Record<string, string> = {
 };
 
 type Answer = { isAnswered: boolean; text?: string; reason?: string; usage?: object };
-/** Files by absolute path (with their mtimes), and whether listing the home folder is refused. */
-type Disk = { files?: Record<string, string>; mtimes?: Record<string, number>; refuseHome?: boolean };
+/** Files by absolute path (with their mtimes), whether listing the home folder is refused, a store key prefix whose writes are refused. */
+type Disk = { files?: Record<string, string>; mtimes?: Record<string, number>; refuseHome?: boolean; refuseStore?: string };
 
 const HOME = '/test-home';
+const SESSION = 'test-session';
 
 function world(on: On, store: Record<string, unknown> = {}, answers: { fork?: Answer; complete?: Answer; queue?: Answer[] } = {}, disk: Disk = {}) {
   const logs: string[] = [];
@@ -83,9 +84,12 @@ function world(on: On, store: Record<string, unknown> = {}, answers: { fork?: An
   });
   on('store.get', async (_$, e) => ({ value: saved.get(e.key) }));
   on('store.set', async (_$, e) => {
+    if (disk.refuseStore && e.key.startsWith(disk.refuseStore)) throw new Error(`EACCES: not allowed to write ${e.key}`);
     saved.set(e.key, e.value);
     return { value: undefined };
   });
+  on('store.keys', async () => ({ value: [...saved.keys()] }));
+  on('session.id', async () => ({ value: SESSION }));
   on('store.delete', async (_$, e) => {
     saved.delete(e.key);
     return { value: undefined };
@@ -289,9 +293,85 @@ describe('/buddy', () => {
     await w.clock.settle();
     expect(w.completes[0]?.model).toBe('haiku');
     expect(w.completes[0]?.system).toContain('You are Fixy, a test fixture.');
-    expect(w.completes[0]?.prompt).toBe('The user asks you directly: hello?');
+    // The greeting the bubble showed is remembered, before the question.
+    expect(w.completes[0]?.prompt).toMatch(/^Recently \(oldest first\):\nFixy: Fixy says hi\.\n[\s\S]*The user asks you directly: hello\?$/);
     expect(await shows(ui, /Fresh answer\./)).toBe(true);
     await ui.unmount();
+  });
+
+  test('the second question remembers the first answer, before the question; kept per session in the store', async ($, on) => {
+    const w = world(on, { character: 'fixy' }, { fork: { isAnswered: true, text: 'Forty-two, friend.' } });
+    await $.session.start(START);
+    const ui = await band($);
+    await $.command.run(run('remember the word pineapple'));
+    await w.clock.settle();
+    expect(w.forks[0]).not.toContain('Forty-two');
+    await $.command.run(run('what word?'));
+    await w.clock.settle();
+    const p = w.forks[1]!;
+    // One exchange for the question with its answer; the thinking filler (Fixy ponders.) is never remembered.
+    expect(p).toContain('Recently (oldest first):\nFixy: Fixy says hi.\nYou: remember the word pineapple\nFixy: Forty-two, friend.\n');
+    expect(p).not.toContain('Fixy ponders.');
+    expect(p).toContain('you may refer back to it');
+    expect(p.indexOf('Fixy: Forty-two, friend.')).toBeLessThan(p.indexOf('The user asks you directly: what word?'));
+    expect(p).not.toContain('You: what word?');
+    expect(w.saved.get(`memory:${SESSION}`)).toMatchObject({
+      characters: {
+        fixy: [
+          { kind: 'line', text: 'Fixy says hi.' },
+          { kind: 'question', question: 'remember the word pineapple', answer: 'Forty-two, friend.' },
+          { kind: 'question', question: 'what word?', answer: 'Forty-two, friend.' },
+        ],
+      },
+    });
+    await ui.unmount();
+  });
+
+  test('the fresh-session completion carries the memory too', async ($, on) => {
+    const w = world(on, { character: 'fixy', [`memory:${SESSION}`]: { at: 1, characters: { fixy: [{ kind: 'question', question: 'remember pineapple', answer: 'Pineapple, noted.' }] } } }, { fork: { isAnswered: false, reason: 'nothing-to-fork' } });
+    await $.session.start(START);
+    await $.command.run(run('which word?'));
+    await w.clock.settle();
+    expect(w.completes[0]?.prompt).toMatch(/^Recently \(oldest first\):\nYou: remember pineapple\nFixy: Pineapple, noted\.\n[\s\S]*The user asks you directly: which word\?$/);
+  });
+
+  test('a switched character never claims another one\'s words', async ($, on) => {
+    const w = world(on, { character: 'fixy' }, { fork: { isAnswered: true, text: 'Forty-two, friend.' } });
+    await $.session.start(START);
+    const ui = await band($);
+    await $.command.run(run('remember the word pineapple'));
+    await w.clock.settle();
+    await $.command.run(run('use professor'));
+    await ui.unmount();
+    const again = await band($);
+    await $.command.run(run('what word?'));
+    await w.clock.settle();
+    expect(w.forks[1]).toContain('Professor Fixture: Professor fixture here.');
+    expect(w.forks[1]).not.toMatch(/pineapple|Forty-two|Fixy/);
+    await again.unmount();
+  });
+
+  test('a memory that cannot be saved is said in the next reply, never left out in silence', async ($, on) => {
+    const w = world(on, { character: 'fixy' }, {}, { refuseStore: 'memory:' });
+    await $.session.start(START);
+    await $.command.run(run('first?'));
+    await w.clock.settle();
+    const out = (await $.command.run(run('second?'))).text;
+    // The kit turns the refusal into its own rejection: the reply names what failed and the kit's reason.
+    expect(out).toMatch(/^Asked Fixy\. \(Its memory: remembering the (question|answer|line) failed: .+\)$/);
+    expect(w.logs.some((l) => /^buddy: remembering the (question|answer|line) failed: .+/.test(l))).toBe(true);
+    expect(w.saved.has(`memory:${SESSION}`)).toBe(false);
+  });
+
+  test('a malformed stored memory is said in the reply, and what is sound is still remembered', async ($, on) => {
+    const w = world(on, { character: 'fixy', [`memory:${SESSION}`]: { at: 1, characters: { fixy: [{ who: 'you', kind: 'question', text: 'old shape' }, { kind: 'line', text: 'Still here.' }] } } });
+    await $.session.start(START);
+    const out = (await $.command.run(run('anyone?'))).text;
+    await w.clock.settle();
+    expect(out).toBe('Asked Fixy. (Its memory: reading the memory failed: the stored memory had 1 malformed exchange, dropped)');
+    expect(w.logs).toContain('buddy: reading the memory failed: the stored memory had 1 malformed exchange, dropped');
+    expect(w.forks[0]).toContain('Fixy: Still here.');
+    expect(w.forks[0]).not.toContain('old shape');
   });
 
   test('a failed answer says the thread was lost', async ($, on) => {
@@ -411,7 +491,8 @@ describe('/buddy-personality', () => {
     expect(await label(pane, 'use:professor')).toBe('  Professor Fixture (professor)');
     expect(await label(pane, 'use:broken')).toBe('  broken (invalid)');
     expect(await shows(pane, /^Fixy$/)).toBe(true);
-    expect(await shows(pane, /^You are Fixy, a test fixture\.$/)).toBe(true);
+    expect(await shows(pane, /^Fixy, a test fixture\.$/)).toBe(true);
+    expect(await shows(pane, /You are Fixy/)).toBe(false);
     expect(await shows(pane, /^“Fixy says hi\.”$/)).toBe(true);
     expect(await shows(pane, /^No folder set: the characterDir option names one\.$/)).toBe(true);
     await pane.unmount();
@@ -439,7 +520,7 @@ describe('/buddy-personality', () => {
   });
 
   // The kit cannot raise the person's Esc (ui.close, origin person): the open
-  // asks closeOnEscape, and live-proof (j) watches Esc close it for real.
+  // asks closeOnEscape, and live-proof (i) watches Esc close it for real.
   test('Esc: asked for at the open; a highlight alone changes nothing', async ($, on) => {
     const w = world(on, { character: 'fixy' }, {}, { files: { [CONFIG]: config() } });
     await $.session.start(START);
@@ -469,6 +550,8 @@ describe('/buddy-personality', () => {
     expect(await shows(pane, /^Mochi$/)).toBe(true);
     expect(await shows(pane, eyesOf('npm'))).toBe(true);
     expect(await shows(pane, /^hatched 2026-04-01$/)).toBe(true);
+    expect(await shows(pane, /^A round little creature who hums at green tests\.$/)).toBe(true);
+    expect(await shows(pane, /You are Mochi/)).toBe(false);
     expect(await shows(pane, /^SNARK +[█░]{10} \d+$/)).toBe(true);
     expect(await shows(pane, /<-->/)).toBe(false);
     await w.clock.advance(1000);

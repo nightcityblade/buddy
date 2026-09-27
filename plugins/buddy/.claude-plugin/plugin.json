@@ -52,6 +52,12 @@
       "title": "Minimum seconds between quips",
       "description": "A quip waits at least this long after the previous one.",
       "default": 45
+    },
+    "memory": {
+      "type": "number",
+      "title": "How many recent exchanges the buddy remembers (0 = off)",
+      "description": "An exchange is a /buddy question with its answer, or a line it said on its own; they go into its next answer or quip, kept per session and per character; at most 30.",
+      "default": 6
     }
   }
 }

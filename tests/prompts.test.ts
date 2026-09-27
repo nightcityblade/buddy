@@ -25,3 +25,22 @@ describe('prompts', () => {
     expect(lostThread('Fixy', 'api-error')).toBe('(Fixy lost the thread: api-error)');
   });
 });
+
+describe('memory in the prompts', () => {
+  const memory = 'Recently (oldest first):\nYou: remember pineapple\nCat: Noted.';
+  test('before the question, with leave to refer back to it', () => {
+    const f = forkPrompt('You are X.', 'what word', memory);
+    expect(f.indexOf(memory)).toBeGreaterThan(f.indexOf('You are X.'));
+    expect(f.indexOf(memory)).toBeLessThan(f.indexOf('The user asks you directly: what word'));
+    expect(f).toContain('you may refer back to it');
+    const c = questionPrompt('what word', memory);
+    expect(c.startsWith(memory)).toBe(true);
+    expect(c.endsWith('The user asks you directly: what word')).toBe(true);
+    const qp = quipPrompt({ tools: ['Read'], failures: 0, lastBash: '' }, memory);
+    expect(qp.indexOf(memory)).toBeLessThan(qp.indexOf('The turn just ended.'));
+  });
+  test('no memory: the prompts as before', () => {
+    expect(questionPrompt('hi', '')).toBe('The user asks you directly: hi');
+    expect(forkPrompt('You are X.', 'why', '')).toBe(forkPrompt('You are X.', 'why'));
+  });
+});

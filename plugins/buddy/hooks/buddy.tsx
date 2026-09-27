@@ -10,6 +10,7 @@ import {
   MENU_COMMAND, MENU_PANE, MENU_TITLE, PREVIEW_MS, allItems, buildMenu, currentKeyOf, findItem, menuRows, previewOf, rowLabel,
   type Item, type Menu, type Originals,
 } from '../src/menu.ts';
+import { MEMORY_KEY_PREFIX, MEMORY_SESSIONS, bookOf, recall, record, render, staleKeys, storeKey, type Book, type Exchange, type Stored } from '../src/memory.ts';
 import { expandHome, resolveOptions, type Options } from '../src/options.ts';
 import { QUESTION_MAX_TOKENS, QUIP_MAX_TOKENS, forkPrompt, oneLine, oneLineSystem, questionPrompt, quipPrompt, type TurnSummary } from '../src/prompts.ts';
 import { roll, type Roll, type Variant } from '../src/hatch.ts';
@@ -49,6 +50,12 @@ type State = {
   clockPeriod: number;
   lastKey: string;
   lastTickError: string;
+  /** This session's memory as last loaded or written; loaded again when the session id changes (a start, a /clear, a reload). */
+  memory: { sessionId: string; book: Book } | null;
+  /** Every memory read and write, one after another, in the order made. */
+  memoryChain: Promise<void>;
+  /** The last memory failure, said in the next /buddy question's reply; '' when none since. */
+  memoryError: string;
 };
 
 /** The open menu: its rows, the one drawn now, where the focus started and is, the preview's frame. */
@@ -116,9 +123,84 @@ function applyChoice(st: State, $: EngineInterface): void {
   setCharacter(st.b, choice.character, choice.error, Math.random);
 }
 
+// ---- memory ---------------------------------------------------------------
+
+function memoryFailed(st: State, $: EngineInterface, what: string, error: unknown): void {
+  log($, what, error);
+  st.memoryError = `${what} failed: ${message(error)}`;
+}
+
+/** The newest MEMORY_SESSIONS sessions' memory stays in the store, `current` among them; the rest is deleted. */
+async function pruneMemory($: EngineInterface, current: string): Promise<void> {
+  const sessions: { key: string; at: number }[] = [];
+  for (const key of await $.store.keys()) {
+    if (!key.startsWith(MEMORY_KEY_PREFIX) || key === storeKey(current)) continue;
+    const v = await $.store.get(key);
+    sessions.push({ key, at: typeof v === 'object' && v !== null && typeof (v as Stored).at === 'number' ? (v as Stored).at : 0 });
+  }
+  for (const key of staleKeys(sessions, MEMORY_SESSIONS - 1)) await $.store.delete(key);
+}
+
+/** The session's book, by `$.session.id()` (the transcript's name): a new id loads its own from the store. */
+async function bookFor(st: State, $: EngineInterface): Promise<{ sessionId: string; book: Book }> {
+  const sessionId = await $.session.id();
+  if (st.memory?.sessionId === sessionId) return st.memory;
+  const loaded = bookOf(await $.store.get(storeKey(sessionId)));
+  if (loaded.error) memoryFailed(st, $, 'reading the memory', new Error(loaded.error));
+  st.memory = { sessionId, book: loaded.book };
+  try {
+    await pruneMemory($, sessionId);
+  } catch (error) {
+    memoryFailed(st, $, "deleting old sessions' memory", error);
+  }
+  return st.memory;
+}
+
+/** Appends the exchange `x` to the ring of `characterId` and saves the session's book; the memory option 0 keeps nothing. */
+function keep(st: State, $: EngineInterface, characterId: string, x: Exchange): void {
+  const n = st.options.memory;
+  if (n === 0) return;
+  st.memoryChain = st.memoryChain.then(async () => {
+    try {
+      const m = await bookFor(st, $);
+      m.book = record(m.book, characterId, x, n);
+      const stored: Stored = { at: Date.now(), characters: m.book };
+      await $.store.set(storeKey(m.sessionId), stored);
+    } catch (error) {
+      memoryFailed(st, $, `remembering the ${x.kind}`, error);
+    }
+  });
+}
+
+/** What `c` remembers of this session, rendered for a prompt, after every write made before; '' when nothing or off. */
+async function recollect(st: State, $: EngineInterface, c: Character): Promise<string> {
+  const n = st.options.memory;
+  if (n === 0) return '';
+  let text = '';
+  st.memoryChain = st.memoryChain.then(async () => {
+    try {
+      text = render(recall((await bookFor(st, $)).book, c.id, n), c.name);
+    } catch (error) {
+      memoryFailed(st, $, 'reading the memory', error);
+    }
+  });
+  await st.memoryChain;
+  return text;
+}
+
+/** The canned lines the brain said since last taken: kept when the band shows them, dropped while hidden. */
+function heard(st: State, $: EngineInterface): void {
+  const b = st.b;
+  if (!b || b.said.length === 0) return;
+  const said = b.said.splice(0);
+  if (st.hidden) return;
+  for (const s of said) keep(st, $, s.id, { kind: 'line', text: s.text });
+}
+
 // ---- clock and redraw ---------------------------------------------------
 
 function refresh(st: State, $: EngineInterface): void {
+  heard(st, $);
   if (!st.b || st.hidden) return;
   const key = JSON.stringify(sceneOf(st.b));
   if (key === st.lastKey) return;
@@ -201,9 +283,10 @@ async function startSession(st: State, $: EngineInterface): Promise<void> {
 
 // ---- ui.render: AbovePrompt ---------------------------------------------
 
-function bandScene(st: State, p: BandProps): Scene | null {
+function bandScene(st: State, $: EngineInterface, p: BandProps): Scene | null {
   if (p.hasSurvey || !st.b || st.hidden) return null;
   observeBand(st.b, { cols: p.bodyColumns, maxRows: p.maxRows, isWorking: p.isWorking }, Math.random);
+  heard(st, $);
   const scene = sceneOf(st.b);
   st.lastKey = JSON.stringify(scene);
   return scene;
@@ -261,11 +344,15 @@ function onToolCall(st: State, $: EngineInterface, e: ToolCallInput, r: ToolCall
 async function quip(st: State, $: EngineInterface, t: TurnSummary): Promise<void> {
   const b = st.b;
   if (!b) return;
+  const c = b.character;
   try {
-    const r = await $.model.complete({ model: st.options.quipModel, system: oneLineSystem(b.character.persona), prompt: quipPrompt(t), maxTokens: QUIP_MAX_TOKENS });
+    const memory = await recollect(st, $, c);
+    const r = await $.model.complete({ model: st.options.quipModel, system: oneLineSystem(c.persona), prompt: quipPrompt(t, memory), maxTokens: QUIP_MAX_TOKENS });
     const text = r.isAnswered ? oneLine(r.text) : '';
-    if (text) answer(b, text, t.failures > 0 ? 'oops' : 'yay');
-    else {
+    if (text) {
+      answer(b, text, t.failures > 0 ? 'oops' : 'yay');
+      keep(st, $, c.id, { kind: 'quip', text });
+    } else {
       const reason = r.isAnswered ? 'empty reply' : r.reason;
       $.ui.log(`buddy: a quip got no answer: ${reason}`);
       failAnswer(b, reason);
@@ -535,7 +622,7 @@ function drawMenu(Box: Component, Text: Component, Button: Component, m: MenuSta
       <Box key="preview" flexDirection="column">
         {p.rows.map((row) => <Text color={p.color}>{row}</Text>)}
         <Text bold>{p.name}</Text>
-        <Text dimColor wrap="truncate-end">{p.persona}</Text>
+        <Text dimColor wrap="truncate-end">{p.about}</Text>
         <Text italic wrap="truncate-end">{`“${p.sample}”`}</Text>
         {p.card.map((row) => <Text wrap="truncate-end">{row}</Text>)}
       </Box>
@@ -561,21 +648,25 @@ async function save($: EngineInterface, key: string, value: unknown): Promise<st
   }
 }
 
-async function ask(st: State, $: EngineInterface, question: string): Promise<void> {
+/** `memory`: what the buddy remembered before this question, rendered; it goes before the question. */
+async function ask(st: State, $: EngineInterface, question: string, memory: string): Promise<void> {
   const b = st.b;
   if (!b) return;
   const c = b.character;
+  let said = '';
   try {
-    const complete = () => $.model.complete({ model: st.options.quipModel, system: oneLineSystem(c.persona), prompt: questionPrompt(question), maxTokens: QUESTION_MAX_TOKENS });
+    const complete = () => $.model.complete({ model: st.options.quipModel, system: oneLineSystem(c.persona), prompt: questionPrompt(question, memory), maxTokens: QUESTION_MAX_TOKENS });
     let r: ModelForkResult;
     if (st.options.questionMode === 'fork') {
-      r = await $.model.fork({ prompt: forkPrompt(c.persona, question) });
+      r = await $.model.fork({ prompt: forkPrompt(c.persona, question, memory) });
       // A new session has no reply to fork from yet: ask the quip model alone.
       if (!r.isAnswered && r.reason === 'nothing-to-fork') r = await complete();
     } else r = await complete();
     const text = r.isAnswered ? oneLine(r.text) : '';
-    if (text) answer(b, text);
-    else {
+    if (text) {
+      answer(b, text);
+      said = text;
+    } else {
       const reason = r.isAnswered ? 'empty reply' : r.reason;
       $.ui.log(`buddy: a /buddy question got no answer: ${reason}`);
       failAnswer(b, reason);
@@ -584,6 +675,8 @@ async function ask(st: State, $: EngineInterface, question: string): Promise<voi
     log($, 'a /buddy question', error);
     failAnswer(b, message(error));
   }
+  // One exchange: the question with its answer, or the question alone when it got none.
+  keep(st, $, c.id, said ? { kind: 'question', question, answer: said } : { kind: 'question', question });
   refresh(st, $);
 }
 
@@ -624,6 +717,7 @@ async function runCommand(st: State, $: EngineInterface, args: string): Promise<
       }
       case 'off': {
         const line = farewell(b, Math.random);
+        heard(st, $);
         st.hidden = true;
         const note = await save($, 'hidden', true);
         stopClock(st);
@@ -631,6 +725,8 @@ async function runCommand(st: State, $: EngineInterface, args: string): Promise<
         return { text: `${b.character.name}: "${line}" (hidden; /buddy on brings ${b.character.name} back)${note}` };
       }
       case 'on': {
+        // Lines said while hidden were never shown: dropped, not remembered.
+        heard(st, $);
         st.hidden = false;
         const note = await save($, 'hidden', false);
         wake(b, Math.random);
@@ -655,10 +751,15 @@ async function runCommand(st: State, $: EngineInterface, args: string): Promise<
       case 'question': {
         if (st.options.questionMode === 'off') return { text: 'questions are off (questionMode)' };
         if (st.hidden) return { text: `${b.character.name} is hidden; /buddy on first` };
+        const c = b.character;
+        // What it remembers from before this question; the question joins it with its answer, in ask.
+        const memory = await recollect(st, $, c);
         beginQuestion(b, Math.random);
         refresh(st, $);
-        ask(st, $, action.text).catch((error) => log($, 'a /buddy question', error));
-        return { text: `Asked ${b.character.name}.` };
+        ask(st, $, action.text, memory).catch((error) => log($, 'a /buddy question', error));
+        const trouble = st.memoryError;
+        st.memoryError = '';
+        return { text: `Asked ${c.name}.${trouble ? ` (Its memory: ${trouble})` : ''}` };
       }
     }
   } catch (error) {
@@ -686,6 +787,9 @@ export const register: Register = (on: On, options: PluginOptions) => {
     clockPeriod: 0,
     lastKey: '',
     lastTickError: '',
+    memory: null,
+    memoryChain: Promise.resolve(),
+    memoryError: '',
   };
 
   on('session.start', async ($, e, next) => {
@@ -700,7 +804,7 @@ export const register: Register = (on: On, options: PluginOptions) => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     try {
-      const scene = bandScene(st, e.props);
+      const scene = bandScene(st, $, e.props);
       if (!scene) return next(e);
       const { Box, Text } = $.ui.resolve(e);
       return drawBand(Box, Text, scene);
